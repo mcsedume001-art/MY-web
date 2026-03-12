@@ -1,0 +1,1081 @@
+/* ============================================
+   RESET & BASE STYLES
+============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --success-color: #2ecc71;
+    --warning-color: #f39c12;
+    --dark-color: #2c3e50;
+    --light-color: #ecf0f1;
+    --gray-color: #95a5a6;
+    --border-radius: 10px;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: var(--dark-color);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+
+/* ============================================
+   HEADER
+============================================ */
+
+header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 25px 40px;
+    text-align: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.logo i {
+    font-size: 3rem;
+}
+
+.logo h1 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+
+/* ============================================
+   LESSON TITLE
+============================================ */
+
+.lesson-title {
+    padding: 20px 40px;
+    background: white;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.lesson-title h2 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.arrange-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.arrange-btn {
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.arrange-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+/* ============================================
+   MAIN CONTENT
+============================================ */
+
+.main-content {
+    display: flex;
+    gap: 30px;
+    padding: 30px;
+    min-height: 700px;
+}
+
+.left-panel,
+.right-panel {
+    flex: 1;
+    min-width: 0;
+}
+
+.panel-content {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    height: 100%;
+}
+
+
+/* ============================================
+   GRID OVERLAY
+============================================ */
+
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: linear-gradient(rgba(52, 152, 219, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(52, 152, 219, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+
+.grid-overlay.active {
+    opacity: 1;
+}
+
+
+/* ============================================
+   RESOURCE FRAMES
+============================================ */
+
+.resource-frame {
+    background: rgb(255, 255, 255);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: var(--transition);
+    border: 2px solid transparent;
+    min-height: 300px;
+    max-height: 800px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.resource-frame:hover {
+    border-color: var(--secondary-color);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+.theory-card {
+    border-left: 4px solid var(--success-color);
+}
+
+.size-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-family: monospace;
+    z-index: 10;
+    display: none;
+}
+
+.resource-frame:hover .size-indicator {
+    display: block;
+}
+
+
+/* ============================================
+   FRAME HEADER
+============================================ */
+
+.frame-header {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.frame-header h3 {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.frame-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.frame-btn {
+    background: white;
+    border: 1px solid #dee2e6;
+    color: var(--secondary-color);
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+
+.frame-btn:hover {
+    background: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+}
+
+
+/* ============================================
+   PDF VIEWER SPECIFIC STYLES
+============================================ */
+
+.pdf-viewer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.pdf-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0;
+}
+
+.pdf-tool {
+    background: white;
+    border: 1px solid #dee2e6;
+    color: var(--secondary-color);
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.pdf-tool:hover {
+    background: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+}
+
+.pdf-zoom {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--dark-color);
+    min-width: 50px;
+    text-align: center;
+}
+
+.pdf-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.pdf-container iframe,
+.pdf-container object {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: none;
+}
+
+.pdf-container .active-viewer {
+    display: block;
+}
+
+.pdf-object {
+    background: white;
+}
+
+.pdf-fallback {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.pdf-preview {
+    text-align: center;
+    max-width: 400px;
+}
+
+.pdf-preview-icon {
+    font-size: 4rem;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.pdf-preview-info h4 {
+    font-size: 1.3rem;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.pdf-preview-info p {
+    color: var(--gray-color);
+    margin-bottom: 20px;
+}
+
+.pdf-preview-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pdf-action-btn {
+    padding: 12px 20px;
+    border-radius: 6px;
+    border: 2px solid var(--secondary-color);
+    background: white;
+    color: var(--secondary-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 500;
+    transition: var(--transition);
+    width: 100%;
+}
+
+.pdf-action-btn.primary {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.pdf-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+/* ============================================
+   IFRAME CONTAINER
+============================================ */
+
+.iframe-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.iframe-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+
+/* ============================================
+   FALLBACK CONTENT
+============================================ */
+
+.fallback-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px;
+}
+
+.fallback-icon {
+    font-size: 3.5rem;
+    color: var(--gray-color);
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+.fallback-content h4 {
+    font-size: 1.3rem;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.fallback-content p {
+    color: var(--gray-color);
+    margin-bottom: 20px;
+}
+
+
+/* ============================================
+   RESOURCE INFO
+============================================ */
+
+.resource-info {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.resource-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 0.85rem;
+    color: var(--gray-color);
+}
+
+.resource-meta i {
+    margin-right: 5px;
+}
+
+.resource-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.resource-link-btn {
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.resource-link-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.resource-link-btn.secondary {
+    background: white;
+    color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
+}
+
+.resource-link-btn.secondary:hover {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.resource-link-btn.outline {
+    background: transparent;
+    border: 2px solid var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+.resource-link-btn.outline:hover {
+    background: var(--secondary-color);
+    color: white;
+}
+
+
+/* ============================================
+   SINHALA TEXT CONTENT
+============================================ */
+
+.sinhala-text {
+    padding: 20px;
+    line-height: 1.7;
+    flex: 1;
+}
+
+.sinhala-text p {
+    margin-bottom: 15px;
+}
+
+.key-points {
+    background: #e8f4fd;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border-left: 4px solid var(--secondary-color);
+}
+
+.key-points h4 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.key-points ul {
+    list-style: none;
+    padding-left: 5px;
+}
+
+.key-points li {
+    margin-bottom: 8px;
+    padding-left: 25px;
+    position: relative;
+}
+
+.key-points li i {
+    position: absolute;
+    left: 0;
+    color: var(--secondary-color);
+}
+
+.equations {
+    margin: 20px 0;
+}
+
+.equations h4 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.equation {
+    font-family: 'Courier New', monospace;
+    background: #f8f9fa;
+    padding: 10px 15px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    font-size: 1rem;
+    color: var(--dark-color);
+}
+
+
+/* ============================================
+   TABS
+============================================ */
+
+.resource-tabs {
+    display: flex;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0 20px;
+    flex-shrink: 0;
+}
+
+.resource-tab {
+    background: none;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    color: var(--gray-color);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    transition: var(--transition);
+    border-bottom: 3px solid transparent;
+}
+
+.resource-tab:hover {
+    color: var(--secondary-color);
+}
+
+.resource-tab.active {
+    color: var(--secondary-color);
+    border-bottom-color: var(--secondary-color);
+    background: rgba(52, 152, 219, 0.05);
+}
+
+
+/* ============================================
+   RESOURCE CONTENT & PANES
+============================================ */
+
+.resource-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.resource-pane {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.resource-pane.active {
+    display: flex;
+}
+
+
+/* ============================================
+   EXTRA RESOURCES
+============================================ */
+
+.extra-resources,
+.extra-simulations {
+    padding: 40px 30px;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.extra-icon {
+    font-size: 4rem;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    width: 100%;
+    max-width: 600px;
+    margin: 30px 0;
+}
+
+.resource-item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: left;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.resource-item:hover {
+    border-color: var(--secondary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.resource-item-icon {
+    font-size: 1.8rem;
+    color: var(--secondary-color);
+}
+
+.resource-item-content h5 {
+    font-size: 1rem;
+    color: var(--dark-color);
+    margin-bottom: 5px;
+}
+
+.resource-item-content p {
+    font-size: 0.85rem;
+    color: var(--gray-color);
+    line-height: 1.4;
+}
+
+.sim-buttons {
+    display: flex;
+    gap: 15px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.sim-btn {
+    background: white;
+    border: 2px solid var(--secondary-color);
+    color: var(--secondary-color);
+    padding: 15px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: var(--transition);
+    font-weight: 500;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.sim-btn:hover {
+    background: var(--secondary-color);
+    color: white;
+    transform: translateY(-3px);
+}
+
+
+/* ============================================
+   PRESETS
+============================================ */
+
+.arrange-presets {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.arrange-presets h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.preset-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    background: white;
+    color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: var(--transition);
+    flex: 1;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.preset-btn:hover {
+    background: var(--secondary-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+
+/* ============================================
+   CONTROLS
+============================================ */
+
+.controls {
+    padding: 20px 40px;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.control-btn {
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.control-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.control-btn.outline {
+    background: white;
+    color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
+}
+
+.control-btn.outline:hover {
+    background: var(--secondary-color);
+    color: white;
+}
+
+
+/* ============================================
+   FOOTER
+============================================ */
+
+footer {
+    background: var(--primary-color);
+    color: white;
+    padding: 25px 40px;
+    text-align: center;
+}
+
+footer p {
+    margin-bottom: 10px;
+}
+
+.footer-note {
+    font-size: 0.85rem;
+    color: #bdc3c7;
+    margin-top: 10px;
+}
+
+
+/* ============================================
+   STATUS INDICATORS
+============================================ */
+
+.auto-arrange-status,
+.snap-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--secondary-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.auto-arrange-status.active,
+.snap-indicator.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.snap-indicator {
+    background: var(--success-color);
+    top: 70px;
+}
+
+
+/* ============================================
+   RESIZE HANDLE
+============================================ */
+
+.resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background: var(--secondary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: se-resize;
+    border-radius: var(--border-radius) 0 var(--border-radius) 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 5;
+}
+
+.resource-frame:hover .resize-handle {
+    opacity: 1;
+}
+
+
+/* ============================================
+   ANIMATIONS
+============================================ */
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes snap {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes gridLines {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+.arranging {
+    animation: pulse 0.5s ease;
+}
+
+.snapped {
+    animation: snap 0.3s ease;
+}
+
+.grid-overlay.active {
+    animation: gridLines 2s linear infinite;
+}
+
+
+/* ============================================
+   RESPONSIVE DESIGN
+============================================ */
+
+@media (max-width: 1200px) {
+    .main-content {
+        flex-direction: column;
+    }
+    .left-panel,
+    .right-panel {
+        width: 100%;
+    }
+    .controls {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    header {
+        padding: 20px;
+    }
+    .logo {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    .lesson-title {
+        padding: 15px 20px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .arrange-controls {
+        justify-content: center;
+    }
+    .main-content {
+        padding: 20px;
+        gap: 20px;
+    }
+    .frame-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    .resource-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    .resource-links {
+        justify-content: center;
+    }
+    .controls {
+        padding: 15px;
+    }
+    .resource-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ============================================
+   SCROLLBAR
+============================================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #2980b9;
+}

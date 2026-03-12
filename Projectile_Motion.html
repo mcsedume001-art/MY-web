@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projectile Motion - Auto-Arranging Cards | MC EDUCATION</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f9ff;
+            color: #333;
+            line-height: 1.6;
+            padding: 10px;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Reduced Header Size */
+        
+        header {
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+            flex-shrink: 0;
+            min-height: 70px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        
+        .logo i {
+            font-size: 1.8rem;
+            margin-right: 12px;
+        }
+        
+        .logo h1 {
+            font-size: 2rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 3px;
+        }
+        
+        .lesson-title {
+            background-color: #f0f5ff;
+            padding: 12px 25px;
+            border-bottom: 1px solid #e0e7ff;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 60px;
+        }
+        
+        .lesson-title h2 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-bottom: 3px;
+        }
+        
+        .lesson-title p {
+            color: #555;
+            font-size: 0.9rem;
+        }
+        
+        .arrange-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .arrange-btn {
+            background-color: #4a6491;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        /* Main Content - Maximized */
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding: 15px;
+            gap: 15px;
+        }
+        
+        .left-panel,
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .panel-content {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .resource-frame {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e1e8ff;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            transition: all 0.3s ease;
+            z-index: 1;
+            min-width: 250px;
+            min-height: 150px;
+        }
+        
+        .resource-frame.dragging {
+            z-index: 100;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            opacity: 0.95;
+        }
+        
+        .resource-frame.resizing {
+            z-index: 100;
+            border-color: #4a6491;
+            box-shadow: 0 4px 15px rgba(74, 100, 145, 0.3);
+        }
+        
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: none;
+            z-index: 0;
+        }
+        
+        .grid-overlay.active {
+            display: block;
+        }
+        
+        .grid-line {
+            position: absolute;
+            background-color: rgba(74, 100, 145, 0.08);
+        }
+        
+        .grid-line.vertical {
+            width: 1px;
+            height: 100%;
+        }
+        
+        .grid-line.horizontal {
+            height: 1px;
+            width: 100%;
+        }
+        
+        .resize-handle {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 16px;
+            height: 16px;
+            background-color: #4a6491;
+            cursor: se-resize;
+            border-radius: 50% 0 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            z-index: 10;
+        }
+        
+        .resize-handle:hover {
+            background-color: #3a5379;
+            transform: scale(1.05);
+        }
+        
+        .frame-header {
+            background-color: #4a6491;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: move;
+            user-select: none;
+            min-height: 45px;
+            flex-shrink: 0;
+        }
+        
+        .frame-header h3 {
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .frame-header h3 i {
+            margin-right: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .frame-controls {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .frame-btn {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            font-size: 0.8rem;
+        }
+        
+        .frame-btn:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+        
+        .iframe-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background-color: #f8f9fa;
+        }
+        
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        
+        .size-indicator {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.65rem;
+            z-index: 5;
+            display: none;
+        }
+        
+        .fallback-content {
+            padding: 15px;
+            text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa;
+        }
+        
+        .fallback-icon {
+            font-size: 2.5rem;
+            color: #4a6491;
+            margin-bottom: 12px;
+        }
+        
+        .fallback-content h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .fallback-content p {
+            color: #666;
+            margin-bottom: 15px;
+            max-width: 90%;
+            font-size: 0.9rem;
+        }
+        /* Compact Resource Info */
+        
+        .resource-info {
+            background: linear-gradient(145deg, #f0f8ff, #e8f0ff);
+            padding: 10px 12px;
+            border-top: 1px solid #e0e7ff;
+            font-size: 0.8rem;
+            max-height: 120px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        
+        .resource-info h5 {
+            color: #2c3e50;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+        
+        .resource-info ul {
+            padding-left: 18px;
+            margin-bottom: 8px;
+        }
+        
+        .resource-info li {
+            margin-bottom: 3px;
+            font-size: 0.8rem;
+        }
+        
+        .resource-links {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .resource-link-btn {
+            flex: 1;
+            background: #4a6491;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        
+        .resource-link-btn:hover {
+            background: #3a5379;
+        }
+        
+        .sinhala-text {
+            font-family: 'Iskoola Pota', 'Noto Sans Sinhala', sans-serif;
+            line-height: 1.6;
+            padding: 12px;
+            background-color: #f8fbff;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            overflow-y: auto;
+            max-height: 180px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        
+        .key-points {
+            background-color: #f0f8ff;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin: 8px 0;
+            font-size: 0.85rem;
+        }
+        
+        .equation {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            background-color: #f8f8f8;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin: 6px 0;
+            display: inline-block;
+            font-size: 0.85rem;
+        }
+        /* Compact Controls */
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px;
+            background-color: #f0f5ff;
+            border-top: 1px solid #e0e7ff;
+            flex-shrink: 0;
+            min-height: 55px;
+        }
+        
+        .control-btn {
+            background-color: #4a6491;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
+            font-size: 0.85rem;
+        }
+        
+        .control-btn:hover {
+            background-color: #3a5379;
+        }
+        
+        .control-btn.outline {
+            background-color: transparent;
+            border: 1px solid #4a6491;
+            color: #4a6491;
+        }
+        
+        .control-btn.outline:hover {
+            background-color: #4a6491;
+            color: white;
+        }
+        /* Reduced Footer Size */
+        
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 10px 15px;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            min-height: 50px;
+        }
+        
+        .auto-arrange-status {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background-color: #4a6491;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .snap-indicator {
+            position: fixed;
+            background-color: #4a6491;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.65rem;
+            display: none;
+            z-index: 1001;
+        }
+        
+        .arrange-presets {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .preset-btn {
+            background-color: #e1e8ff;
+            border: 1px solid #4a6491;
+            color: #4a6491;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        
+        .preset-btn:hover {
+            background-color: #4a6491;
+            color: white;
+        }
+        /* Compact Tabs */
+        
+        .resource-tabs {
+            display: flex;
+            background: #f0f5ff;
+            border-bottom: 1px solid #e0e7ff;
+            flex-shrink: 0;
+        }
+        
+        .resource-tab {
+            flex: 1;
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #555;
+            transition: all 0.2s;
+            text-align: center;
+            border-right: 1px solid #e0e7ff;
+            font-size: 0.8rem;
+        }
+        
+        .resource-tab:last-child {
+            border-right: none;
+        }
+        
+        .resource-tab:hover {
+            background: #e1e8ff;
+        }
+        
+        .resource-tab.active {
+            background: white;
+            color: #4a6491;
+            border-bottom: 2px solid #4a6491;
+        }
+        
+        .resource-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .resource-pane {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .resource-pane.active {
+            display: flex;
+        }
+        /* Custom Scrollbar */
+        
+         ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+         ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+         ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+         ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+                padding: 12px;
+            }
+            .left-panel,
+            .right-panel {
+                min-height: 350px;
+            }
+            .lesson-title {
+                flex-direction: column;
+                gap: 12px;
+                padding: 10px 20px;
+            }
+            .arrange-controls {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+            .container {
+                height: auto;
+            }
+            .main-content {
+                flex-direction: column;
+                padding: 10px;
+            }
+            .controls {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .resource-frame {
+                min-width: 200px;
+                min-height: 120px;
+            }
+            header {
+                padding: 12px 20px;
+            }
+            .lesson-title h2 {
+                font-size: 1.2rem;
+            }
+            footer {
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auto-arrange-status" id="arrangeStatus">
+        <i class="fas fa-magic"></i> Auto-arranging...
+    </div>
+
+    <div class="snap-indicator" id="snapIndicator">
+        <i class="fas fa-magnet"></i> Snapped
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <h1>MC EDUCATION</h1>
+            </div>
+            <p class="subtitle">ප්‍රක්ෂේපණ චලිතය - Auto-Arranging Cards</p>
+        </header>
+
+        <div class="lesson-title">
+            <div>
+                <h2>ප්‍රක්ෂේපණ චලිතය - Projectile Motion</h2>
+                <p>Cards auto-arrange when moved or resized</p>
+            </div>
+            <div class="arrange-controls">
+                <button class="arrange-btn" onclick="toggleAutoArrange()">
+                    <i class="fas fa-robot" id="autoArrangeIcon"></i> 
+                    <span id="autoArrangeText">Auto: ON</span>
+                </button>
+                <button class="arrange-btn" onclick="showGrid()">
+                    <i class="fas fa-th"></i> Grid
+                </button>
+                <button class="arrange-btn" onclick="autoArrangeAll()">
+                    <i class="fas fa-magic"></i> Auto-All
+                </button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Panel: Video and Theory -->
+            <div class="left-panel">
+                <div class="grid-overlay" id="leftGrid"></div>
+                <div class="panel-content" id="leftPanelContent">
+                    <!-- Video Frame -->
+                    <div class="resource-frame" id="videoCard" data-panel="left" data-index="0">
+                        <div class="size-indicator" id="videoSize"></div>
+                        <div class="frame-header" id="videoHeader">
+                            <h3><i class="fas fa-play-circle"></i> Video</h3>
+                            <div class="frame-controls">
+                                <button class="frame-btn" title="Auto-Fit" onclick="autoFitCard('videoCard')">
+                                    <i class="fas fa-crop-alt"></i>
+                                </button>
+                                <button class="frame-btn" title="Full Screen" onclick="openVideoInNewWindow()">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="iframe-container" id="videoContainer">
+                            <iframe src="https://www.youtube.com/embed/NwL6QR9kJOM" title="Projectile Motion Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen onerror="showVideoFallback()">
+                            </iframe>
+                            <div class="fallback-content" id="videoFallback" style="display: none;">
+                                <div class="fallback-icon">
+                                    <i class="fas fa-video"></i>
+                                </div>
+                                <h4>Video Not Available</h4>
+                                <p>YouTube video cannot be loaded.</p>
+                                <button class="control-btn" onclick="openVideoInNewWindow()">
+                                    <i class="fab fa-youtube"></i> Open Video
+                                </button>
+                            </div>
+                        </div>
+                        <div class="resource-info">
+                            <h5><i class="fas fa-info-circle"></i> Description:</h5>
+                            <p>Complete explanation of projectile motion concepts with visual examples.</p>
+                            <div class="resource-links">
+                                <a href="https://www.youtube.com/watch?v=NwL6QR9kJOM" target="_blank" class="resource-link-btn">
+                                    <i class="fab fa-youtube"></i> YouTube
+                                </a>
+                                <button class="resource-link-btn secondary" onclick="openVideoFullscreen()">
+                                    <i class="fas fa-expand"></i> Full
+                                </button>
+                            </div>
+                        </div>
+                        <div class="resize-handle" data-card="videoCard">
+                            <i class="fas fa-arrows-alt-h"></i>
+                        </div>
+                    </div>
+
+                    <!-- Theory Summary -->
+                    <div class="sinhala-text">
+                        <p><strong>ප්‍රක්ෂේපණ චලිතය (Projectile Motion)</strong> යනු කිසියම් වස්තුවක් පොළොවට යම් කෝණයකින් අවකාශයට විසි කළ විට, එය ගුරුත්වාකර්ෂණ බලය යටතේ ගමන් කරන ආකාරයයි.</p>
+
+                        <div class="key-points">
+                            <strong>ප්‍රධාන කරුණු:</strong>
+                            <ul style="padding-left: 20px; margin-top: 5px;">
+                                <li>තිරස් චලිතය: ඒකාකාර ප්‍රවේගයෙන්</li>
+                                <li>සිරස් චලිතය: ඒකාකාර ත්වරණයෙන් (g ≈ 9.81 m/s²)</li>
+                                <li>වැදගත් පද: ප්‍රක්ෂේපණ ප්‍රවේගය (u), කෝණය (θ), විහිදුම (R), උපරිම උස (H)</li>
+                            </ul>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <strong>සමීකරණ:</strong><br>
+                            <div class="equation">x = u cos(θ) · t</div>
+                            <div class="equation">y = u sin(θ) · t - ½gt²</div>
+                        </div>
+
+                        <div class="arrange-presets">
+                            <strong>Layouts:</strong>
+                            <button class="preset-btn" onclick="applyPreset('verticalStack')">
+                                <i class="fas fa-bars"></i> Vertical
+                            </button>
+                            <button class="preset-btn" onclick="applyPreset('horizontalSplit')">
+                                <i class="fas fa-columns"></i> Split
+                            </button>
+                            <button class="preset-btn" onclick="applyPreset('videoFocus')">
+                                <i class="fas fa-video"></i> Video
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: PDF and Practicals -->
+            <div class="right-panel">
+                <div class="grid-overlay" id="rightGrid"></div>
+                <div class="panel-content" id="rightPanelContent">
+                    <!-- PDF Frame -->
+                    <div class="resource-frame" id="pdfCard" data-panel="right" data-index="0">
+                        <div class="size-indicator" id="pdfSize"></div>
+                        <div class="frame-header" id="pdfHeader">
+                            <h3><i class="fas fa-file-pdf"></i> PDF Notes</h3>
+                            <div class="frame-controls">
+                                <button class="frame-btn" title="Switch" onclick="switchPDF()">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </button>
+                                <button class="frame-btn" title="Auto-Fit" onclick="autoFitCard('pdfCard')">
+                                    <i class="fas fa-crop-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="resource-tabs">
+                            <button class="resource-tab active" data-pdf="basic">Basic</button>
+                            <button class="resource-tab" data-pdf="advanced">Advanced</button>
+                            <button class="resource-tab" data-pdf="extra">Extra</button>
+                        </div>
+
+                        <div class="resource-content">
+                            <div class="resource-pane active" id="pdfBasicPane">
+                                <div class="iframe-container" id="pdfContainer">
+                                    <iframe src="https://drive.google.com/file/d/1KiM-siIliBZXq_EORIz3ET6EzaWYyfUC/preview" title="Projectile Motion Basic Theory PDF" onerror="showPDFFallback('basic')" id="pdfBasicIframe">
+                                    </iframe>
+                                    <div class="fallback-content" id="pdfBasicFallback" style="display: none;">
+                                        <div class="fallback-icon">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </div>
+                                        <h4>Basic Theory PDF</h4>
+                                        <p>Complete theory, equations, and examples.</p>
+                                        <button class="control-btn" onclick="openPDF('basic')">
+                                            <i class="fas fa-external-link-alt"></i> Open
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="resource-info">
+                                    <h5><i class="fas fa-book"></i> Details:</h5>
+                                    <p>Introduction, equations, examples. 15 pages.</p>
+                                    <div class="resource-links">
+                                        <a href="https://drive.google.com/file/d/1KiM-siIliBZXq_EORIz3ET6EzaWYyfUC/view" target="_blank" class="resource-link-btn">
+                                            <i class="fas fa-external-link-alt"></i> Open
+                                        </a>
+                                        <button class="resource-link-btn secondary" onclick="downloadPDF('basic')">
+                                            <i class="fas fa-download"></i> Download
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="resource-pane" id="pdfAdvancedPane">
+                                <div class="iframe-container">
+                                    <iframe src="https://drive.google.com/file/d/1Pl2_7sNlqPdkFHt-mni9zRrMXgA6ES2B/preview" title="Projectile Motion Advanced Problems PDF" onerror="showPDFFallback('advanced')" id="pdfAdvancedIframe">
+                                    </iframe>
+                                    <div class="fallback-content" id="pdfAdvancedFallback" style="display: none;">
+                                        <div class="fallback-icon">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <h4>Advanced Problems PDF</h4>
+                                        <p>Complex problems and applications.</p>
+                                        <button class="control-btn" onclick="openPDF('advanced')">
+                                            <i class="fas fa-external-link-alt"></i> Open
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="resource-info">
+                                    <h5><i class="fas fa-chart-line"></i> Details:</h5>
+                                    <p>Complex problems, worked solutions. 20 pages.</p>
+                                    <div class="resource-links">
+                                        <a href="https://drive.google.com/file/d/1Pl2_7sNlqPdkFHt-mni9zRrMXgA6ES2B/view" target="_blank" class="resource-link-btn">
+                                            <i class="fas fa-external-link-alt"></i> Open
+                                        </a>
+                                        <button class="resource-link-btn secondary" onclick="downloadPDF('advanced')">
+                                            <i class="fas fa-download"></i> Download
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="resource-pane" id="pdfExtraPane">
+                                <div class="fallback-content" style="display: flex;">
+                                    <div class="fallback-icon">
+                                        <i class="fas fa-folder-open"></i>
+                                    </div>
+                                    <h4>Additional Resources</h4>
+                                    <p>More study materials for projectile motion</p>
+                                    <button class="control-btn" onclick="openExtraResources()">
+                                        <i class="fas fa-external-link-alt"></i> Browse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resize-handle" data-card="pdfCard">
+                            <i class="fas fa-arrows-alt-h"></i>
+                        </div>
+                    </div>
+
+                    <!-- Practical Simulations -->
+                    <div class="resource-frame" id="practicalCard" data-panel="right" data-index="1">
+                        <div class="size-indicator" id="practicalSize"></div>
+                        <div class="frame-header" id="practicalHeader">
+                            <h3><i class="fas fa-flask"></i> Simulations</h3>
+                            <div class="frame-controls">
+                                <button class="frame-btn" title="Switch" onclick="switchSimulation()">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </button>
+                                <button class="frame-btn" title="Auto-Fit" onclick="autoFitCard('practicalCard')">
+                                    <i class="fas fa-crop-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="resource-tabs">
+                            <button class="resource-tab active" data-sim="motion">Motion</button>
+                            <button class="resource-tab" data-sim="data">Data Lab</button>
+                            <button class="resource-tab" data-sim="more">More</button>
+                        </div>
+
+                        <div class="resource-content">
+                            <div class="resource-pane active" id="simMotionPane">
+                                <div class="iframe-container">
+                                    <iframe src="https://phet.colorado.edu/sims/html/projectile-motion/latest/projectile-motion_all.html" title="Projectile Motion Simulation" onerror="showSimulationFallback('motion')" id="simMotionIframe">
+                                    </iframe>
+                                    <div class="fallback-content" id="simMotionFallback" style="display: none;">
+                                        <div class="fallback-icon">
+                                            <i class="fas fa-bullseye"></i>
+                                        </div>
+                                        <h4>Motion Simulation</h4>
+                                        <p>Interactive simulation.</p>
+                                        <button class="control-btn" onclick="openSimulation('motion')">
+                                            <i class="fas fa-external-link-alt"></i> Open
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="resource-info">
+                                    <h5><i class="fas fa-bullseye"></i> Features:</h5>
+                                    <p>Adjust angle, velocity, mass. Visualize trajectory.</p>
+                                    <div class="resource-links">
+                                        <a href="https://phet.colorado.edu/sims/html/projectile-motion/latest/projectile-motion_all.html" target="_blank" class="resource-link-btn">
+                                            <i class="fas fa-external-link-alt"></i> Open
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="resource-pane" id="simDataPane">
+                                <div class="iframe-container">
+                                    <iframe src="https://phet.colorado.edu/sims/html/projectile-data-lab/latest/projectile-data-lab_all.html" title="Projectile Data Lab" onerror="showSimulationFallback('data')" id="simDataIframe">
+                                    </iframe>
+                                    <div class="fallback-content" id="simDataFallback" style="display: none;">
+                                        <div class="fallback-icon">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <h4>Data Lab</h4>
+                                        <p>Analyze data and graphs.</p>
+                                        <button class="control-btn" onclick="openSimulation('data')">
+                                            <i class="fas fa-external-link-alt"></i> Open
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="resource-info">
+                                    <h5><i class="fas fa-chart-line"></i> Features:</h5>
+                                    <p>Collect data, create graphs, analyze results.</p>
+                                    <div class="resource-links">
+                                        <a href="https://phet.colorado.edu/sims/html/projectile-data-lab/latest/projectile-data-lab_all.html" target="_blank" class="resource-link-btn">
+                                            <i class="fas fa-external-link-alt"></i> Open
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="resource-pane" id="simMorePane">
+                                <div class="fallback-content" style="display: flex;">
+                                    <div class="fallback-icon">
+                                        <i class="fas fa-cogs"></i>
+                                    </div>
+                                    <h4>More Simulations</h4>
+                                    <p>Additional interactive simulations</p>
+                                    <button class="control-btn" onclick="openMoreSimulations()">
+                                        <i class="fas fa-external-link-alt"></i> Browse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="resize-handle" data-card="practicalCard">
+                            <i class="fas fa-arrows-alt-h"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compact Controls -->
+        <div class="controls">
+            <button class="control-btn" onclick="smartArrange()">
+                <i class="fas fa-brain"></i> Smart
+            </button>
+            <button class="control-btn outline" onclick="resetToDefault()">
+                <i class="fas fa-home"></i> Reset
+            </button>
+            <button class="control-btn outline" onclick="toggleSnapToGrid()">
+                <i class="fas fa-magnet" id="snapIcon"></i> 
+                <span id="snapText">Snap: ON</span>
+            </button>
+        </div>
+
+        <footer>
+            <p>MC EDUCATION &copy; 2023 | Auto-Arranging Cards System</p>
+        </footer>
+    </div>
+
+    <script>
+        // Enhanced Auto-Arranging Algorithm
+        const CONFIG = {
+            autoArrange: true,
+            snapToGrid: true,
+            gridSize: 15,
+            animationSpeed: 250,
+            currentPDF: 'basic',
+            currentSimulation: 'motion',
+            cards: []
+        };
+
+        // State
+        let isDragging = false;
+        let isResizing = false;
+        let currentCard = null;
+        let startX, startY, startWidth, startHeight;
+
+        // Initialize with auto-arrange
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCards();
+            setupEventListeners();
+            setupResourceTabs();
+            autoArrangeAll();
+            showMessage('Cards auto-arrange when moved or resized. Scroll panels to see all content.');
+        });
+
+        // Initialize cards with compact layout
+        function initializeCards() {
+            const leftPanel = document.getElementById('leftPanelContent');
+            const rightPanel = document.getElementById('rightPanelContent');
+
+            // Clear existing cards
+            CONFIG.cards = [];
+
+            // Create card objects for better management
+            const cardElements = document.querySelectorAll('.resource-frame');
+            cardElements.forEach((card, index) => {
+                const panel = card.getAttribute('data-panel');
+                const panelElement = panel === 'left' ? leftPanel : rightPanel;
+
+                // Store card data
+                const cardData = {
+                    id: card.id,
+                    element: card,
+                    panel: panel,
+                    panelElement: panelElement,
+                    width: 250,
+                    height: 150,
+                    x: 0,
+                    y: 0,
+                    zIndex: 1
+                };
+
+                CONFIG.cards.push(cardData);
+
+                // Set initial position
+                card.style.width = '100%';
+                card.style.height = '250px';
+
+                if (panel === 'left') {
+                    if (card.id === 'videoCard') {
+                        card.style.top = '0px';
+                    } else {
+                        // Video is the only card in left panel
+                    }
+                } else if (panel === 'right') {
+                    if (card.id === 'pdfCard') {
+                        card.style.top = '0px';
+                    } else if (card.id === 'practicalCard') {
+                        card.style.top = '270px'; // 250px height + 20px gap
+                    }
+                }
+            });
+
+            updateAllSizeIndicators();
+            updatePanelsScrollHeight();
+        }
+
+        // Enhanced auto-arrange algorithm
+        function autoArrangeAll() {
+            autoArrangePanel('left');
+            autoArrangePanel('right');
+            showArrangeStatus('All cards auto-arranged');
+        }
+
+        function autoArrangePanel(panelType) {
+            const panelCards = CONFIG.cards.filter(card => card.panel === panelType);
+            if (panelCards.length === 0) return;
+
+            const panelElement = panelCards[0].panelElement;
+            const panelWidth = panelElement.clientWidth;
+            const panelHeight = panelElement.scrollHeight || panelElement.clientHeight;
+            const numCards = panelCards.length;
+
+            // Simple vertical stacking
+            panelCards.forEach((card, index) => {
+                const cardHeight = Math.min(250, panelHeight / numCards - 20);
+
+                card.element.style.width = (panelWidth - 10) + 'px';
+                card.element.style.height = cardHeight + 'px';
+                card.element.style.left = '5px';
+                card.element.style.top = (index * (cardHeight + 20)) + 'px';
+
+                // Update card data
+                card.width = panelWidth - 10;
+                card.height = cardHeight;
+                card.x = 5;
+                card.y = index * (cardHeight + 20);
+            });
+
+            updateAllSizeIndicators();
+            updatePanelsScrollHeight();
+        }
+
+        // Smart arrange based on window size
+        function smartArrange() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            if (windowWidth < 768) {
+                applyPreset('verticalStack');
+            } else if (windowWidth < 1200) {
+                applyPreset('horizontalSplit');
+            } else {
+                applyPreset('videoFocus');
+            }
+
+            showArrangeStatus('Smart layout applied');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.querySelectorAll('.frame-header').forEach(header => {
+                header.addEventListener('mousedown', startDrag);
+                header.addEventListener('touchstart', startDragTouch, {
+                    passive: false
+                });
+            });
+
+            document.querySelectorAll('.resize-handle').forEach(handle => {
+                handle.addEventListener('mousedown', startResize);
+                handle.addEventListener('touchstart', startResizeTouch, {
+                    passive: false
+                });
+            });
+
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('touchmove', handleTouchMove, {
+                passive: false
+            });
+            document.addEventListener('touchend', handleTouchEnd);
+
+            // Add scroll event listeners to panels
+            const panels = document.querySelectorAll('.panel-content');
+            panels.forEach(panel => {
+                panel.addEventListener('scroll', function() {
+                    updateCardZIndices();
+                });
+            });
+        }
+
+        // Setup resource tabs
+        function setupResourceTabs() {
+            document.querySelectorAll('.resource-tab[data-pdf]').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const pdfType = this.getAttribute('data-pdf');
+                    document.querySelectorAll('.resource-tab[data-pdf]').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    CONFIG.currentPDF = pdfType;
+
+                    document.querySelectorAll('#pdfCard .resource-pane').forEach(pane => {
+                        pane.classList.remove('active');
+                    });
+                    document.getElementById(`pdf${pdfType.charAt(0).toUpperCase() + pdfType.slice(1)}Pane`).classList.add('active');
+                });
+            });
+
+            document.querySelectorAll('.resource-tab[data-sim]').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const simType = this.getAttribute('data-sim');
+                    document.querySelectorAll('.resource-tab[data-sim]').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    CONFIG.currentSimulation = simType;
+
+                    document.querySelectorAll('#practicalCard .resource-pane').forEach(pane => {
+                        pane.classList.remove('active');
+                    });
+                    document.getElementById(`sim${simType.charAt(0).toUpperCase() + simType.slice(1)}Pane`).classList.add('active');
+                });
+            });
+        }
+
+        // Drag and resize functions
+        function startDrag(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            isDragging = true;
+            currentCard = e.target.closest('.resource-frame');
+            currentCard.classList.add('dragging');
+
+            // Bring to front
+            CONFIG.cards.forEach(card => {
+                if (card.element === currentCard) {
+                    card.zIndex = 100;
+                } else {
+                    card.zIndex = 1;
+                }
+                card.element.style.zIndex = card.zIndex;
+            });
+
+            const rect = currentCard.getBoundingClientRect();
+            const panelRect = currentCard.parentElement.getBoundingClientRect();
+
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+
+            // Store original position for snap-back if needed
+            currentCard._originalX = rect.left - panelRect.left;
+            currentCard._originalY = rect.top - panelRect.top;
+        }
+
+        function startResize(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            isResizing = true;
+            currentCard = e.target.closest('.resource-frame');
+            currentCard.classList.add('resizing');
+
+            startX = e.clientX || e.touches[0].clientX;
+            startY = e.clientY || e.touches[0].clientY;
+            startWidth = currentCard.offsetWidth;
+            startHeight = currentCard.offsetHeight;
+        }
+
+        function handleMouseMove(e) {
+            if (!currentCard) return;
+
+            if (isDragging) {
+                handleDrag(e.clientX, e.clientY);
+            } else if (isResizing) {
+                handleResize(e.clientX, e.clientY);
+            }
+        }
+
+        function handleDrag(clientX, clientY) {
+            const panel = currentCard.parentElement;
+            const panelRect = panel.getBoundingClientRect();
+            const panelScrollTop = panel.scrollTop;
+
+            let newX = clientX - panelRect.left - startX;
+            let newY = clientY - panelRect.top - startY + panelScrollTop;
+
+            if (CONFIG.snapToGrid) {
+                newX = Math.round(newX / CONFIG.gridSize) * CONFIG.gridSize;
+                newY = Math.round(newY / CONFIG.gridSize) * CONFIG.gridSize;
+            }
+
+            // Constrain within panel boundaries
+            const maxX = panel.scrollWidth - currentCard.offsetWidth;
+            const maxY = panel.scrollHeight - currentCard.offsetHeight;
+
+            newX = Math.max(0, Math.min(newX, maxX));
+            newY = Math.max(0, Math.min(newY, maxY));
+
+            currentCard.style.left = newX + 'px';
+            currentCard.style.top = newY + 'px';
+
+            // Auto-arrange other cards if enabled
+            if (CONFIG.autoArrange) {
+                const panelType = currentCard.getAttribute('data-panel');
+                autoArrangeOtherCards(panelType, currentCard.id);
+            }
+
+            updateSizeIndicator(currentCard.id);
+        }
+
+        function handleResize(clientX, clientY) {
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+
+            let newWidth = startWidth + dx;
+            let newHeight = startHeight + dy;
+
+            // Apply minimum constraints
+            newWidth = Math.max(newWidth, 250);
+            newHeight = Math.max(newHeight, 150);
+
+            // Apply maximum constraints (panel size)
+            const panel = currentCard.parentElement;
+            const maxWidth = panel.scrollWidth - currentCard.offsetLeft;
+            const maxHeight = panel.scrollHeight - currentCard.offsetTop;
+
+            newWidth = Math.min(newWidth, maxWidth);
+            newHeight = Math.min(newHeight, maxHeight);
+
+            if (CONFIG.snapToGrid) {
+                newWidth = Math.round(newWidth / CONFIG.gridSize) * CONFIG.gridSize;
+                newHeight = Math.round(newHeight / CONFIG.gridSize) * CONFIG.gridSize;
+            }
+
+            // Apply new dimensions
+            currentCard.style.width = newWidth + 'px';
+            currentCard.style.height = newHeight + 'px';
+
+            // Auto-arrange other cards if enabled
+            if (CONFIG.autoArrange) {
+                const panelType = currentCard.getAttribute('data-panel');
+                autoArrangeOtherCards(panelType, currentCard.id);
+            }
+
+            updateSizeIndicator(currentCard.id);
+            showSnapIndicator();
+            updatePanelsScrollHeight();
+        }
+
+        function autoArrangeOtherCards(panelType, excludedCardId) {
+            const panelCards = CONFIG.cards.filter(card =>
+                card.panel === panelType && card.id !== excludedCardId
+            );
+
+            if (panelCards.length === 0) return;
+
+            const currentCardElement = document.getElementById(excludedCardId);
+            const currentCardRect = currentCardElement.getBoundingClientRect();
+            const panel = currentCardElement.parentElement;
+
+            panelCards.forEach(card => {
+                const cardRect = card.element.getBoundingClientRect();
+
+                // Check for collision
+                if (isColliding(currentCardRect, cardRect)) {
+                    // Move card down
+                    const newTop = currentCardRect.bottom - cardRect.top + 20;
+                    card.element.style.top = (parseFloat(card.element.style.top || 0) + newTop) + 'px';
+                }
+            });
+        }
+
+        function isColliding(rect1, rect2) {
+            return !(rect1.right < rect2.left ||
+                rect1.left > rect2.right ||
+                rect1.bottom < rect2.top ||
+                rect1.top > rect2.bottom);
+        }
+
+        function handleMouseUp() {
+            if (isDragging || isResizing) {
+                if (currentCard) {
+                    currentCard.classList.remove('dragging');
+                    currentCard.classList.remove('resizing');
+
+                    if (CONFIG.autoArrange) {
+                        const panelType = currentCard.getAttribute('data-panel');
+                        autoArrangeOtherCards(panelType, currentCard.id);
+                        showArrangeStatus('Cards rearranged');
+                    }
+
+                    updatePanelsScrollHeight();
+                }
+
+                isDragging = false;
+                isResizing = false;
+                currentCard = null;
+            }
+        }
+
+        // Touch event handlers
+        function startDragTouch(e) {
+            startDrag(e.touches[0]);
+        }
+
+        function startResizeTouch(e) {
+            startResize(e.touches[0]);
+        }
+
+        function handleTouchMove(e) {
+            if (!currentCard || e.touches.length === 0) return;
+
+            if (isDragging) {
+                handleDrag(e.touches[0].clientX, e.touches[0].clientY);
+            } else if (isResizing) {
+                handleResize(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }
+
+        function handleTouchEnd() {
+            handleMouseUp();
+        }
+
+        // Layout presets
+        function applyPreset(presetName) {
+            const videoCard = document.getElementById('videoCard');
+            const pdfCard = document.getElementById('pdfCard');
+            const practicalCard = document.getElementById('practicalCard');
+            const leftPanel = document.getElementById('leftPanelContent');
+            const rightPanel = document.getElementById('rightPanelContent');
+
+            switch (presetName) {
+                case 'verticalStack':
+                    // All cards in left panel vertically stacked
+                    leftPanel.appendChild(videoCard);
+                    leftPanel.appendChild(pdfCard);
+                    leftPanel.appendChild(practicalCard);
+
+                    videoCard.style.width = 'calc(100% - 10px)';
+                    videoCard.style.height = '200px';
+                    videoCard.style.left = '5px';
+                    videoCard.style.top = '5px';
+
+                    pdfCard.style.width = 'calc(100% - 10px)';
+                    pdfCard.style.height = '200px';
+                    pdfCard.style.left = '5px';
+                    pdfCard.style.top = '215px'; // 200 + 15 gap
+
+                    practicalCard.style.width = 'calc(100% - 10px)';
+                    practicalCard.style.height = '200px';
+                    practicalCard.style.left = '5px';
+                    practicalCard.style.top = '430px'; // 200 + 15 + 200 + 15
+                    break;
+
+                case 'horizontalSplit':
+                    // Video in left, PDF and Practical in right
+                    leftPanel.appendChild(videoCard);
+                    rightPanel.appendChild(pdfCard);
+                    rightPanel.appendChild(practicalCard);
+
+                    videoCard.style.width = 'calc(100% - 10px)';
+                    videoCard.style.height = 'calc(100% - 10px)';
+                    videoCard.style.left = '5px';
+                    videoCard.style.top = '5px';
+
+                    pdfCard.style.width = 'calc(100% - 10px)';
+                    pdfCard.style.height = 'calc(50% - 15px)';
+                    pdfCard.style.left = '5px';
+                    pdfCard.style.top = '5px';
+
+                    practicalCard.style.width = 'calc(100% - 10px)';
+                    practicalCard.style.height = 'calc(50% - 15px)';
+                    practicalCard.style.left = '5px';
+                    practicalCard.style.top = 'calc(50% + 10px)';
+                    break;
+
+                case 'videoFocus':
+                    // Large video on left, small cards on right
+                    leftPanel.appendChild(videoCard);
+                    rightPanel.appendChild(pdfCard);
+                    rightPanel.appendChild(practicalCard);
+
+                    videoCard.style.width = 'calc(100% - 10px)';
+                    videoCard.style.height = 'calc(100% - 10px)';
+                    videoCard.style.left = '5px';
+                    videoCard.style.top = '5px';
+
+                    pdfCard.style.width = 'calc(100% - 10px)';
+                    pdfCard.style.height = 'calc(50% - 15px)';
+                    pdfCard.style.left = '5px';
+                    pdfCard.style.top = '5px';
+
+                    practicalCard.style.width = 'calc(100% - 10px)';
+                    practicalCard.style.height = 'calc(50% - 15px)';
+                    practicalCard.style.left = '5px';
+                    practicalCard.style.top = 'calc(50% + 10px)';
+                    break;
+            }
+
+            // Update card data
+            CONFIG.cards.forEach(card => {
+                const panel = card.element.parentElement;
+                card.panel = panel.id.includes('left') ? 'left' : 'right';
+                card.panelElement = panel;
+            });
+
+            updateAllSizeIndicators();
+            updatePanelsScrollHeight();
+        }
+
+        // Update panels scroll height based on card positions
+        function updatePanelsScrollHeight() {
+            const panels = document.querySelectorAll('.panel-content');
+            panels.forEach(panel => {
+                const cards = panel.querySelectorAll('.resource-frame');
+                let maxBottom = 0;
+
+                cards.forEach(card => {
+                    const cardBottom = card.offsetTop + card.offsetHeight;
+                    if (cardBottom > maxBottom) {
+                        maxBottom = cardBottom;
+                    }
+                });
+
+                // Add some padding at the bottom
+                panel.style.minHeight = Math.max(panel.clientHeight, maxBottom + 20) + 'px';
+            });
+        }
+
+        // Update card z-indices based on scroll position
+        function updateCardZIndices() {
+            CONFIG.cards.forEach(card => {
+                const cardRect = card.element.getBoundingClientRect();
+                const panelRect = card.panelElement.getBoundingClientRect();
+
+                // Cards closer to the top have higher z-index
+                const distanceFromTop = cardRect.top - panelRect.top;
+                card.zIndex = Math.max(1, 100 - Math.abs(distanceFromTop));
+                card.element.style.zIndex = card.zIndex;
+            });
+        }
+
+        // Utility functions
+        function animateCard(card, newStyles) {
+            card.style.transition = `all ${CONFIG.animationSpeed}ms ease`;
+            Object.keys(newStyles).forEach(property => {
+                card.style[property] = newStyles[property];
+            });
+            setTimeout(() => card.style.transition = '', CONFIG.animationSpeed);
+        }
+
+        function toggleAutoArrange() {
+            CONFIG.autoArrange = !CONFIG.autoArrange;
+            const icon = document.getElementById('autoArrangeIcon');
+            const text = document.getElementById('autoArrangeText');
+
+            if (CONFIG.autoArrange) {
+                icon.className = 'fas fa-robot';
+                text.textContent = 'Auto: ON';
+                showArrangeStatus('Auto-arrange enabled');
+            } else {
+                icon.className = 'fas fa-robot-slash';
+                text.textContent = 'Auto: OFF';
+                showArrangeStatus('Auto-arrange disabled');
+            }
+        }
+
+        function toggleSnapToGrid() {
+            CONFIG.snapToGrid = !CONFIG.snapToGrid;
+            const icon = document.getElementById('snapIcon');
+            const text = document.getElementById('snapText');
+
+            if (CONFIG.snapToGrid) {
+                icon.className = 'fas fa-magnet';
+                text.textContent = 'Snap: ON';
+                showSnapIndicator();
+            } else {
+                icon.className = 'fas fa-magnet-slash';
+                text.textContent = 'Snap: OFF';
+            }
+        }
+
+        function autoFitCard(cardId) {
+            const card = document.getElementById(cardId);
+            const panel = card.parentElement;
+
+            card.style.width = (panel.clientWidth - 10) + 'px';
+            card.style.height = (panel.clientHeight - 10) + 'px';
+            card.style.left = '5px';
+            card.style.top = '5px';
+
+            updateAllSizeIndicators();
+            updatePanelsScrollHeight();
+            showArrangeStatus('Card auto-fitted');
+        }
+
+        function resetToDefault() {
+            initializeCards();
+            showArrangeStatus('Reset to default');
+        }
+
+        function showGrid() {
+            const leftGrid = document.getElementById('leftGrid');
+            const rightGrid = document.getElementById('rightGrid');
+
+            if (leftGrid.classList.contains('active')) {
+                leftGrid.classList.remove('active');
+                rightGrid.classList.remove('active');
+            } else {
+                createGrid('leftGrid');
+                createGrid('rightGrid');
+                leftGrid.classList.add('active');
+                rightGrid.classList.add('active');
+                setTimeout(() => {
+                    leftGrid.classList.remove('active');
+                    rightGrid.classList.remove('active');
+                }, 2000);
+            }
+        }
+
+        function createGrid(gridId) {
+            const grid = document.getElementById(gridId);
+            grid.innerHTML = '';
+            const panel = grid.parentElement;
+            const width = panel.clientWidth;
+            const height = panel.clientHeight;
+
+            for (let x = CONFIG.gridSize; x < width; x += CONFIG.gridSize) {
+                const line = document.createElement('div');
+                line.className = 'grid-line vertical';
+                line.style.left = x + 'px';
+                grid.appendChild(line);
+            }
+
+            for (let y = CONFIG.gridSize; y < height; y += CONFIG.gridSize) {
+                const line = document.createElement('div');
+                line.className = 'grid-line horizontal';
+                line.style.top = y + 'px';
+                grid.appendChild(line);
+            }
+        }
+
+        function showArrangeStatus(message = 'Auto-arranging...') {
+            const status = document.getElementById('arrangeStatus');
+            status.innerHTML = `<i class="fas fa-magic"></i> ${message}`;
+            status.style.display = 'block';
+            setTimeout(() => status.style.display = 'none', 1500);
+        }
+
+        function showSnapIndicator() {
+            const indicator = document.getElementById('snapIndicator');
+            if (indicator) {
+                indicator.style.display = 'block';
+                indicator.style.left = (event.clientX + 8) + 'px';
+                indicator.style.top = (event.clientY + 8) + 'px';
+                setTimeout(() => indicator.style.display = 'none', 800);
+            }
+        }
+
+        function updateSizeIndicator(cardId) {
+            const card = document.getElementById(cardId);
+            const indicator = document.getElementById(cardId + 'Size');
+
+            if (card && indicator) {
+                const width = Math.round(card.offsetWidth);
+                const height = Math.round(card.offsetHeight);
+                indicator.textContent = `${width} × ${height}`;
+                indicator.style.display = 'block';
+
+                setTimeout(() => {
+                    if (indicator) {
+                        indicator.style.display = 'none';
+                    }
+                }, 1500);
+            }
+        }
+
+        function updateAllSizeIndicators() {
+            ['videoCard', 'pdfCard', 'practicalCard'].forEach(updateSizeIndicator);
+        }
+
+        function showMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                bottom: 60px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(74, 100, 145, 0.9);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                z-index: 1000;
+                font-size: 0.85rem;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            `;
+            messageDiv.innerHTML = `<i class="fas fa-info-circle"></i> ${text}`;
+            document.body.appendChild(messageDiv);
+            setTimeout(() => {
+                messageDiv.style.opacity = '0';
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.parentNode.removeChild(messageDiv);
+                    }
+                }, 300);
+            }, 2500);
+        }
+
+        // Window resize handler
+        window.addEventListener('resize', function() {
+            if (CONFIG.autoArrange) {
+                autoArrangeAll();
+            }
+            updatePanelsScrollHeight();
+        });
+
+        // Resource functions
+        function switchPDF() {
+            const currentTab = document.querySelector('.resource-tab[data-pdf].active');
+            const nextTab = currentTab.nextElementSibling || document.querySelector('.resource-tab[data-pdf]');
+            if (nextTab) nextTab.click();
+        }
+
+        function switchSimulation() {
+            const currentTab = document.querySelector('.resource-tab[data-sim].active');
+            const nextTab = currentTab.nextElementSibling || document.querySelector('.resource-tab[data-sim]');
+            if (nextTab) nextTab.click();
+        }
+
+        function openVideoInNewWindow() {
+            window.open('https://www.youtube.com/watch?v=NwL6QR9kJOM', '_blank');
+        }
+
+        function openVideoFullscreen() {
+            const videoIframe = document.querySelector('#videoContainer iframe');
+            if (videoIframe) {
+                if (videoIframe.requestFullscreen) videoIframe.requestFullscreen();
+                else if (videoIframe.webkitRequestFullscreen) videoIframe.webkitRequestFullscreen();
+                else if (videoIframe.msRequestFullscreen) videoIframe.msRequestFullscreen();
+            }
+        }
+
+        function showVideoFallback() {
+            const videoIframe = document.querySelector('#videoContainer iframe');
+            const fallback = document.getElementById('videoFallback');
+            if (videoIframe) videoIframe.style.display = 'none';
+            if (fallback) fallback.style.display = 'flex';
+        }
+
+        function showPDFFallback(type) {
+            const iframe = document.getElementById(`pdf${type.charAt(0).toUpperCase() + type.slice(1)}Iframe`);
+            const fallback = document.getElementById(`pdf${type.charAt(0).toUpperCase() + type.slice(1)}Fallback`);
+            if (iframe) iframe.style.display = 'none';
+            if (fallback) fallback.style.display = 'flex';
+        }
+
+        function showSimulationFallback(type) {
+            const iframe = document.getElementById(`sim${type.charAt(0).toUpperCase() + type.slice(1)}Iframe`);
+            const fallback = document.getElementById(`sim${type.charAt(0).toUpperCase() + type.slice(1)}Fallback`);
+            if (iframe) iframe.style.display = 'none';
+            if (fallback) fallback.style.display = 'flex';
+        }
+
+        // Additional utility functions
+        function openPDF(type) {
+            const urls = {
+                basic: 'https://drive.google.com/file/d/1KiM-siIliBZXq_EORIz3ET6EzaWYyfUC/view',
+                advanced: 'https://drive.google.com/file/d/1Pl2_7sNlqPdkFHt-mni9zRrMXgA6ES2B/view'
+            };
+            if (urls[type]) {
+                window.open(urls[type], '_blank');
+            }
+        }
+
+        function downloadPDF(type) {
+            showMessage(`Downloading ${type} PDF...`);
+        }
+
+        function openExtraResources() {
+            showMessage('Opening extra resources...');
+        }
+
+        function openSimulation(type) {
+            const urls = {
+                motion: 'https://phet.colorado.edu/sims/html/projectile-motion/latest/projectile-motion_all.html',
+                data: 'https://phet.colorado.edu/sims/html/projectile-data-lab/latest/projectile-data-lab_all.html'
+            };
+            if (urls[type]) {
+                window.open(urls[type], '_blank');
+            }
+        }
+
+        function openMoreSimulations() {
+            showMessage('Opening more simulations...');
+        }
+    </script>
+</body>
+
+</html>
