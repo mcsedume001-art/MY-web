@@ -1,0 +1,395 @@
+<?php
+// Handle form submission and calculation
+$result = null;
+$error = null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $l1 = filter_input(INPUT_POST, 'l1', FILTER_VALIDATE_FLOAT);
+    $l2 = filter_input(INPUT_POST, 'l2', FILTER_VALIDATE_FLOAT);
+    if ($l1 === false || $l2 === false || $l1 <= 0 || $l2 <= 0) {
+        $error = "Please enter positive numeric values for both balance lengths.";
+    } else {
+        $ratio = $l1 / $l2;
+        $result = sprintf("E₁ : E₂ = %.3f : 1  (based on l₁ = %.1f cm, l₂ = %.1f cm)", $ratio, $l1, $l2);
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potentiometer Simulator: Compare EMF of two cells</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #f5f9ff 0%, #dbe4f0 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 42px;
+            box-shadow: 0 20px 40px rgba(0,15,40,0.25), inset 0 0 0 1px rgba(255,255,255,0.6);
+            padding: 30px 25px;
+            transition: 0.3s;
+        }
+        h1 {
+            font-weight: 600;
+            font-size: 2.2rem;
+            color: #0a1a2f;
+            margin-top: 0;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            border-left: 8px solid #3f6b9c;
+            padding-left: 25px;
+        }
+        .sub {
+            color: #2c405c;
+            margin-left: 33px;
+            margin-bottom: 30px;
+            font-style: italic;
+            font-weight: 300;
+            background: #e9edf3b0;
+            display: inline-block;
+            padding: 6px 22px;
+            border-radius: 40px;
+            backdrop-filter: blur(2px);
+        }
+        .theory-box {
+            background: #102331d9;
+            color: #eef3fc;
+            padding: 18px 25px;
+            border-radius: 48px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 2px 5px #00000033, 0 10px 15px -8px #00000070;
+            backdrop-filter: blur(4px);
+            border: 1px solid #7e9ec0;
+        }
+        .theory-box h2 {
+            margin: 0 0 8px 0;
+            font-weight: 400;
+            color: #c6d9ff;
+            font-size: 1.6rem;
+        }
+        .theory-box p {
+            margin: 8px 0;
+            font-size: 1.2rem;
+        }
+        .theory-box .ratio {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #f9e75c;
+            text-shadow: 0 2px 3px black;
+            background: #1e3a5f;
+            display: inline-block;
+            padding: 5px 30px;
+            border-radius: 60px;
+            letter-spacing: 2px;
+        }
+        .sim-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+        }
+        .circuit-panel {
+            flex: 2;
+            min-width: 340px;
+            background: #d7e3f0;
+            border-radius: 50px;
+            padding: 20px 18px;
+            box-shadow: inset 0 0 0 2px #fbfeff, 0 10px 20px #0000002b;
+            background-image: radial-gradient(circle at 30% 40%, #ffffff60 5%, transparent 30%);
+        }
+        .control-panel {
+            flex: 1.2;
+            min-width: 280px;
+            background: #eef3f9dd;
+            backdrop-filter: blur(6px);
+            border-radius: 50px;
+            padding: 25px 22px;
+            box-shadow: 0 15px 25px #001e3f40, inset 0 1px 4px white;
+            border: 1px solid white;
+        }
+        .circuit-svg-container {
+            width: 100%;
+            background: #bed0e6;
+            border-radius: 40px;
+            padding: 15px 5px 5px 5px;
+            box-shadow: inset 0 -3px 8px #32587b30;
+        }
+        svg {
+            display: block;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 6px 8px #1f3f60b0);
+        }
+        .interact-hint {
+            font-size: 0.9rem;
+            background: #fafbff;
+            padding: 12px 15px;
+            border-radius: 60px;
+            margin: 15px 0 5px;
+            text-align: center;
+            font-weight: 500;
+            color: #022b4e;
+            box-shadow: inset 0 1px 5px #6c8dbb;
+        }
+        .emf-label {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            font-weight: 600;
+            color: #132c42;
+            background: #e3ecf7;
+            border-radius: 40px;
+            padding: 10px 15px;
+            margin-top: 10px;
+        }
+        .emf-label span {
+            background: #1d3e5e;
+            color: white;
+            padding: 4px 20px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+        }
+        .input-group {
+            margin-bottom: 30px;
+        }
+        .input-group label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: #0a2b44;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 16px 22px;
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 80px;
+            background: #f0f8ff;
+            box-shadow: inset 0 4px 8px #0000001a, 0 2px 0 #ffffff;
+            border: 2px solid transparent;
+            transition: 0.2s;
+            font-weight: 600;
+            color: #003366;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #2666a8;
+            background: #ffffff;
+        }
+        .btn {
+            background: #1f4973;
+            border: none;
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 600;
+            padding: 20px 25px;
+            border-radius: 60px;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #0a1d30, 0 10px 25px #001e41;
+            transition: 0.07s linear;
+            letter-spacing: 1px;
+        }
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #0a1d30, 0 5px 15px #001e41;
+        }
+        .result-box {
+            background: #001f3f;
+            border-radius: 40px;
+            padding: 20px 25px;
+            color: #e2fd9e;
+            font-size: 1.7rem;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 30px;
+            word-break: break-word;
+            box-shadow: inset 0 -3px 0 #b0c9e0, 0 15px 20px #00000035;
+            border: 2px solid #7fa5cb;
+        }
+        .error-box {
+            background: #a1233c;
+            color: #ffd9c5;
+            border-radius: 40px;
+            padding: 18px;
+            font-weight: 500;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        .note {
+            background: #eceff4;
+            border-radius: 30px;
+            padding: 18px 25px;
+            margin-top: 25px;
+            border-left: 15px solid #4d6f94;
+            font-size: 0.95rem;
+            color: #111d30;
+            box-shadow: inset 0 0 0 2px #f7fcff;
+        }
+        .note strong {
+            color: #1a4972;
+        }
+        footer {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #3b5777;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>⚡ Potentiometer 2‑cell EMF comparison</h1>
+    <div class="sub">based on practical PHY experiment (pr01.pdf)</div>
+
+    <!-- Theory snippet -->
+    <div class="theory-box">
+        <h2>📐 Theory</h2>
+        <p>If <strong>l₁</strong> (balance for E₁) and <strong>l₂</strong> (balance for E₂) :</p>
+        <p class="ratio">E₁ / E₂ = l₁ / l₂</p>
+    </div>
+
+    <!-- Main interactive row -->
+    <div class="sim-row">
+        <!-- Left: circuit diagram (simulated) -->
+        <div class="circuit-panel">
+            <div class="circuit-svg-container">
+                <!-- SVG schematic of the potentiometer setup (figure 33.1 style) -->
+                <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Potentiometer wire AB -->
+                    <line x1="30" y1="160" x2="370" y2="160" stroke="#1c2e42" stroke-width="5" stroke-linecap="round"/>
+                    <text x="190" y="140" fill="#001d34" font-weight="600" font-size="14">potentiometer wire</text>
+                    <text x="20" y="180" fill="#140c00" font-size="16" font-weight="bold">A</text>
+                    <text x="375" y="180" fill="#140c00" font-size="16" font-weight="bold">B</text>
+                    
+                    <!-- accumulator E0 (left side) -->
+                    <rect x="50" y="30" width="60" height="40" rx="10" fill="#b5d1f0" stroke="#1f3f60" stroke-width="3"/>
+                    <text x="60" y="58" fill="#02233b" font-weight="700">E₀</text>
+                    <text x="58" y="78" fill="#02233b" font-size="10">2V accumulator</text>
+                    <line x1="80" y1="70" x2="80" y2="110" stroke="#0b4b3a" stroke-width="2.5"/>
+                    <line x1="80" y1="110" x2="30" y2="160" stroke="#0b4b3a" stroke-width="2.5"/>
+                    
+                    <!-- key K1 -->
+                    <circle cx="140" cy="120" r="12" fill="#f0e9d0" stroke="#222" stroke-width="3"/>
+                    <text x="135" y="127" fill="black" font-size="16">K₁</text>
+                    <line x1="80" y1="110" x2="140" y2="120" stroke="#0b4b3a" stroke-width="2.5"/>
+                    <line x1="152" y1="124" x2="200" y2="140" stroke="#0b4b3a" stroke-width="2.5"/>
+                    
+                    <!-- Two-way switch area and cells E1 / E2 -->
+                    <rect x="210" y="95" width="90" height="60" rx="15" fill="#fffbee" stroke="#203b58" stroke-width="2.5" stroke-dasharray="4 3"/>
+                    <text x="220" y="120" fill="#043753" font-weight="600">two‑way</text>
+                    <text x="235" y="142" fill="#043753" font-weight="600">switch</text>
+                    
+                    <!-- E1 branch -->
+                    <line x1="200" y1="140" x2="240" y2="140" stroke="#8a5f3c" stroke-width="3"/>
+                    <circle cx="260" cy="140" r="15" fill="#c1d6f0" stroke="#023b5e" stroke-width="3"/>
+                    <text x="254" y="147" fill="#001d2e" font-size="14">E₁</text>
+                    <line x1="275" y1="140" x2="320" y2="160" stroke="#8a5f3c" stroke-width="3"/>
+                    
+                    <!-- E2 branch (via two-way) with dashes to show alternative -->
+                    <line x1="200" y1="180" x2="240" y2="180" stroke="#6f4f2e" stroke-width="3" stroke-dasharray="5 3"/>
+                    <circle cx="260" cy="180" r="15" fill="#f1cfb0" stroke="#5f3f20" stroke-width="3" stroke-dasharray="5 3"/>
+                    <text x="254" y="187" fill="#2b1a08" font-size="14">E₂</text>
+                    <line x1="275" y1="180" x2="320" y2="160" stroke="#6f4f2e" stroke-width="3" stroke-dasharray="5 3"/>
+                    
+                    <!-- to sliding contact and galvanometer -->
+                    <line x1="320" y1="160" x2="350" y2="160" stroke="#a1552b" stroke-width="3"/>
+                    <circle cx="360" cy="160" r="13" fill="#dab07e" stroke="#755121" stroke-width="3"/>
+                    <text x="350" y="180" fill="#2f1f0a" font-size="12">sliding</text>
+                    
+                    <!-- galvanometer G centre zero -->
+                    <rect x="310" y="40" width="60" height="40" rx="15" fill="#e3eef9" stroke="#132231" stroke-width="3"/>
+                    <circle cx="340" cy="60" r="14" fill="white" stroke="#132231" stroke-width="2"/>
+                    <text x="333" y="66" fill="#021c34" font-weight="700" font-size="16">G</text>
+                    <line x1="340" y1="80" x2="340" y2="120" stroke="#2e3f5e" stroke-width="3"/>
+                    <line x1="340" y1="120" x2="360" y2="160" stroke="#2e3f5e" stroke-width="3"/>
+                    
+                    <!-- K2 and safety resistor -->
+                    <circle cx="120" cy="180" r="12" fill="#efe8d5" stroke="#1c3a21" stroke-width="3"/>
+                    <text x="112" y="187" fill="black" font-size="16">K₂</text>
+                    <rect x="150" y="170" width="45" height="25" rx="8" fill="#bdb28b" stroke="#1f4d2b" stroke-width="2"/>
+                    <text x="153" y="190" fill="#1d2c14" font-size="12">5kΩ</text>
+                    <line x1="132" y1="180" x2="150" y2="182" stroke="#2c513a" stroke-width="3"/>
+                    <line x1="195" y1="182" x2="300" y2="162" stroke="#2c513a" stroke-width="3"/>
+                </svg>
+            </div>
+            <div class="interact-hint">
+                <span style="background:#f1c40f; padding:3px 15px; border-radius:30px;">⚡ K₁ closed, K₂ open for balance</span>
+            </div>
+            <div class="emf-label">
+                <span>E₁ (Leclanché) ~1.4V</span>
+                <span>E₂ (Daniell) ~1.1V</span>
+            </div>
+        </div>
+
+        <!-- Right: Input form & simulator -->
+        <div class="control-panel">
+            <form method="post" id="simForm">
+                <div class="input-group">
+                    <label>🔹 l₁ (balance for E₁) <span style="font-size:1rem;">cm</span></label>
+                    <input type="number" step="0.1" min="0.1" name="l1" placeholder="e.g., 380.5" required 
+                           value="<?php echo isset($_POST['l1']) ? htmlspecialchars($_POST['l1']) : ''; ?>">
+                </div>
+                <div class="input-group">
+                    <label>🔸 l₂ (balance for E₂) <span style="font-size:1rem;">cm</span></label>
+                    <input type="number" step="0.1" min="0.1" name="l2" placeholder="e.g., 295.0" required
+                           value="<?php echo isset($_POST['l2']) ? htmlspecialchars($_POST['l2']) : ''; ?>">
+                </div>
+                <button type="submit" class="btn">🔬 CALCULATE RATIO</button>
+            </form>
+
+            <!-- Dynamic result or error -->
+            <?php if ($error): ?>
+                <div class="error-box">⚠️ <?php echo $error; ?></div>
+            <?php elseif ($result): ?>
+                <div class="result-box">📊 <?php echo $result; ?></div>
+            <?php else: ?>
+                <div class="result-box" style="background:#263d57; color:#b1d0f0; font-size:1.3rem;">
+                    ⚙️ Enter l₁, l₂ and click calculate
+                </div>
+            <?php endif; ?>
+
+            <!-- additional note from PDF -->
+            <div class="note">
+                <strong>⚠️ Precautions / Note (from pr01):</strong><br>
+                • Before measuring, touch ends A & B: galvanometer should deflect opposite directions. <br>
+                • Ensure E₀  >  E₁ and E₂, and all polarities correct. <br>
+                • For better accuracy, graphical method (l₁ vs l₂ gradient) can be used with resistance box.
+            </div>
+        </div>
+    </div>
+
+    <!-- Discussion area (simulated) -->
+    <div style="background: #dae6f5; border-radius: 30px; margin-top: 25px; padding: 15px 25px;">
+        <h3 style="color: #102f47;">📋 Discussion & precautions (student guide)</h3>
+        <ul style="columns: 2; list-style-type: '✓   '; color: #122b40;">
+            <li>Positive of E₁, E₂ connected to positive of E₀</li>
+            <li>Use 5 kΩ safety resistor (K₂ closed only for fine balance)</li>
+            <li>Check loose connections; E0 must be fresh > emf of both cells</li>
+            <li>Sliding contact gently to avoid wire wear</li>
+            <li>Minimize thermo‑emf by short circuit</li>
+        </ul>
+    </div>
+
+    <footer>📁 based on pr01.pdf – Potentiometer experiment | simulator v1.0</footer>
+</div>
+
+<!-- if you want to keep entered values after submit -->
+</body>
+</html>

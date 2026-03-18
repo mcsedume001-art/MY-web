@@ -4,350 +4,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projectile Motion - Auto-Arranging Cards | MC EDUCATION</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <title>Physics Lab · Home</title>
+    <!-- simple & clean, only basic hyperlinks to index1 and index2 -->
+    <style>
+        body {
+            background: #f0f4fa;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+        
+        .home-card {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 3rem 3rem 2rem 2rem;
+            padding: 2.5rem 2rem 3rem 2rem;
+            box-shadow: 0 25px 35px -12px #1f3b5c;
+            text-align: center;
+            border: 2px solid #c4d5e8;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 600;
+            color: #003057;
+            margin: 0 0 0.25rem 0;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .subhead {
+            font-size: 1.25rem;
+            color: #1f4973;
+            border-bottom: 3px dashed #a0bcdb;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .lab-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+            align-items: center;
+            margin: 2.2rem 0;
+        }
+        
+        .lab-card {
+            background: #e6f0ff;
+            border-radius: 2rem;
+            padding: 1.5rem 2rem;
+            width: 100%;
+            max-width: 400px;
+            border: 3px solid #96b6da;
+            box-shadow: 0 8px 0 #4e6f94;
+            transition: 0.1s ease;
+            text-decoration: none;
+            color: #001d3d;
+        }
+        
+        .lab-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 0 #345682;
+            background: #dcebff;
+        }
+        
+        .lab-card h2 {
+            font-size: 2rem;
+            margin: 0 0 0.3rem 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .lab-card p {
+            font-size: 1.1rem;
+            margin: 0.5rem 0 0 0;
+            color: #003f6b;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #002b54;
+            color: white;
+            border-radius: 60px;
+            padding: 0.2rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            border: 2px solid #809fc7;
+        }
+        
+        .footer-note {
+            margin-top: 2.5rem;
+            font-size: 1rem;
+            color: #3d618a;
+            border-top: 2px dotted #afc6e2;
+            padding-top: 1.5rem;
+        }
+        
+        .footer-note a {
+            color: #022b52;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="auto-arrange-status" id="arrangeStatus">
-        <i class="fas fa-magic"></i> Auto-arranging...
-    </div>
-
-    <div class="snap-indicator" id="snapIndicator">
-        <i class="fas fa-magnet"></i> Snapped
-    </div>
-
-    <div class="container">
-        <header>
-            <div class="logo">
-                <i class="fas fa-graduation-cap"></i>
-                <h1>MC EDUCATION</h1>
-            </div>
-            <p class="subtitle">ප්‍රක්ෂේපණ චලිතය - Auto-Arranging Cards</p>
-        </header>
-
-        <div class="lesson-title">
-            <div>
-                <h2>ධාරා විද්‍යුතය</h2>
-                <p>Cards auto-arrange when moved or resized</p>
-            </div>
-            <div class="arrange-controls">
-                <button class="arrange-btn" onclick="toggleAutoArrange()">
-                    <i class="fas fa-robot" id="autoArrangeIcon"></i> 
-                    <span id="autoArrangeText">Auto: ON</span>
-                </button>
-                <button class="arrange-btn" onclick="showGrid()">
-                    <i class="fas fa-th"></i> Grid
-                </button>
-                <button class="arrange-btn" onclick="autoArrangeAll()">
-                    <i class="fas fa-magic"></i> Auto-All
-                </button>
-            </div>
+    <div class="home-card">
+        <h1>
+            <span>⚛️</span> PHYSICS LAB
+        </h1>
+        <div class="subhead">
+            potentiometer experiments · two-page website
         </div>
 
-        <div class="main-content">
-            <!-- Left Panel: Video and Theory -->
-            <div class="left-panel">
-                <div class="grid-overlay" id="leftGrid"></div>
-                <div class="panel-content" id="leftPanelContent">
-                    <!-- Video Frame -->
-                    <div class="resource-frame" id="videoCard" data-panel="left" data-index="0">
-                        <div class="size-indicator" id="videoSize"></div>
-                        <div class="frame-header" id="videoHeader">
-                            <h3><i class="fas fa-play-circle"></i> Video</h3>
-                            <div class="frame-controls">
-                                <button class="frame-btn" title="Auto-Fit" onclick="autoFitCard('videoCard')">
-                                    <i class="fas fa-crop-alt"></i>
-                                </button>
-                                <button class="frame-btn" title="Full Screen" onclick="openVideoInNewWindow()">
-                                    <i class="fas fa-external-link-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="iframe-container" id="videoContainer">
-                            <iframe src="https://www.youtube.com/embed/N85qR0_HcbI" title="Projectile Motion Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
-                            </iframe>
-                            <div class="fallback-content" id="videoFallback" style="display: none;">
-                                <div class="fallback-icon">
-                                    <i class="fas fa-video"></i>
-                                </div>
-                                <h4>Video Not Available</h4>
-                                <p>YouTube video cannot be loaded.</p>
-                                <button class="control-btn" onclick="openVideoInNewWindow()">
-                                    <i class="fab fa-youtube"></i> Open Video
-                                </button>
-                            </div>
-                        </div>
-                        <div class="resource-info">
-                            <h5><i class="fas fa-info-circle"></i> Description:</h5>
-                            <p>Complete explanation of projectile motion concepts with visual examples.</p>
-                            <div class="resource-links">
-                                <a href="https://www.youtube.com/watch?v=NwL6QR9kJOM" target="_blank" class="resource-link-btn">
-                                    <i class="fab fa-youtube"></i> YouTube
-                                </a>
-                                <button class="resource-link-btn secondary" onclick="openVideoFullscreen()">
-                                    <i class="fas fa-expand"></i> Full
-                                </button>
-                            </div>
-                        </div>
-                        <div class="resize-handle" data-card="videoCard">
-                            <i class="fas fa-arrows-alt-h"></i>
-                        </div>
-                    </div>
+        <!-- hyperlinks to index1.html and index2.html (basic) -->
+        <div class="lab-links">
+            <!-- index1 link -->
+            <a class="lab-card" href="index1.html" target="_blank" rel="noopener">
+                <h2>
+                    <span>📐</span> index1.html
+                </h2>
+                <p>Comparison of EMFs of two cells using potentiometer</p>
+                <div class="badge">🔗 open experiment page 1</div>
+            </a>
 
-                    <!-- Theory Summary -->
-                    <div class="sinhala-text">
-                        <p><strong>ප්‍රක්ෂේපණ චලිතය (Projectile Motion)</strong> යනු කිසියම් වස්තුවක් පොළොවට යම් කෝණයකින් අවකාශයට විසි කළ විට, එය ගුරුත්වාකර්ෂණ බලය යටතේ ගමන් කරන ආකාරයයි.</p>
-
-                        <div class="key-points">
-                            <strong>ප්‍රධාන කරුණු:</strong>
-                            <ul style="padding-left: 20px; margin-top: 5px;">
-                                <li>තිරස් චලිතය: ඒකාකාර ප්‍රවේගයෙන්</li>
-                                <li>සිරස් චලිතය: ඒකාකාර ත්වරණයෙන් (g ≈ 9.81 m/s²)</li>
-                                <li>වැදගත් පද: ප්‍රක්ෂේපණ ප්‍රවේගය (u), කෝණය (θ), විහිදුම (R), උපරිම උස (H)</li>
-                            </ul>
-                        </div>
-
-                        <div style="margin-top: 10px;">
-                            <strong>සමීකරණ:</strong><br>
-                            <div class="equation">x = u cos(θ) · t</div>
-                            <div class="equation">y = u sin(θ) · t - ½gt²</div>
-                        </div>
-
-                        <div class="arrange-presets">
-                            <strong>Layouts:</strong>
-                            <button class="preset-btn" onclick="applyPreset('verticalStack')">
-                                <i class="fas fa-bars"></i> Vertical
-                            </button>
-                            <button class="preset-btn" onclick="applyPreset('horizontalSplit')">
-                                <i class="fas fa-columns"></i> Split
-                            </button>
-                            <button class="preset-btn" onclick="applyPreset('videoFocus')">
-                                <i class="fas fa-video"></i> Video
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Panel: PDF and Practicals -->
-            <div class="right-panel">
-                <div class="grid-overlay" id="rightGrid"></div>
-                <div class="panel-content" id="rightPanelContent">
-                    <!-- PDF Frame -->
-                    <div class="resource-frame" id="pdfCard" data-panel="right" data-index="0">
-                        <div class="size-indicator" id="pdfSize"></div>
-                        <div class="frame-header" id="pdfHeader">
-                            <h3><i class="fas fa-file-pdf"></i> PDF Notes</h3>
-                            <div class="frame-controls">
-                                <button class="frame-btn" title="Switch" onclick="switchPDF()">
-                                    <i class="fas fa-exchange-alt"></i>
-                                </button>
-                                <button class="frame-btn" title="Auto-Fit" onclick="autoFitCard('pdfCard')">
-                                    <i class="fas fa-crop-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="resource-tabs">
-                            <button class="resource-tab active" data-pdf="basic">Basic</button>
-                            <button class="resource-tab" data-pdf="advanced">Advanced</button>
-                            <button class="resource-tab" data-pdf="extra">Extra</button>
-                        </div>
-
-                        <div class="resource-content">
-                            <div class="resource-pane active" id="pdfBasicPane">
-                                <div class="iframe-container" id="pdfContainer">
-                                    <iframe src="https://drive.google.com/file/d/1KiM-siIliBZXq_EORIz3ET6EzaWYyfUC/preview" title="Projectile Motion Basic Theory PDF" id="pdfBasicIframe">
-                                    </iframe>
-                                    <div class="fallback-content" id="pdfBasicFallback" style="display: none;">
-                                        <div class="fallback-icon">
-                                            <i class="fas fa-file-pdf"></i>
-                                        </div>
-                                        <h4>Basic Theory PDF</h4>
-                                        <p>Complete theory, equations, and examples.</p>
-                                        <button class="control-btn" onclick="openPDF('basic')">
-                                            <i class="fas fa-external-link-alt"></i> Open
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="resource-info">
-                                    <h5><i class="fas fa-book"></i> Details:</h5>
-                                    <p>Introduction, equations, examples. 15 pages.</p>
-                                    <div class="resource-links">
-                                        <a href="https://drive.google.com/file/d/1KiM-siIliBZXq_EORIz3ET6EzaWYyfUC/view" target="_blank" class="resource-link-btn">
-                                            <i class="fas fa-external-link-alt"></i> Open
-                                        </a>
-                                        <button class="resource-link-btn secondary" onclick="downloadPDF('basic')">
-                                            <i class="fas fa-download"></i> Download
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="resource-pane" id="pdfAdvancedPane">
-                                <div class="iframe-container">
-                                    <iframe src="https://drive.google.com/file/d/1Pl2_7sNlqPdkFHt-mni9zRrMXgA6ES2B/preview" title="Projectile Motion Advanced Problems PDF" id="pdfAdvancedIframe">
-                                    </iframe>
-                                    <div class="fallback-content" id="pdfAdvancedFallback" style="display: none;">
-                                        <div class="fallback-icon">
-                                            <i class="fas fa-chart-line"></i>
-                                        </div>
-                                        <h4>Advanced Problems PDF</h4>
-                                        <p>Complex problems and applications.</p>
-                                        <button class="control-btn" onclick="openPDF('advanced')">
-                                            <i class="fas fa-external-link-alt"></i> Open
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="resource-info">
-                                    <h5><i class="fas fa-chart-line"></i> Details:</h5>
-                                    <p>Complex problems, worked solutions. 20 pages.</p>
-                                    <div class="resource-links">
-                                        <a href="https://drive.google.com/file/d/1Pl2_7sNlqPdkFHt-mni9zRrMXgA6ES2B/view" target="_blank" class="resource-link-btn">
-                                            <i class="fas fa-external-link-alt"></i> Open
-                                        </a>
-                                        <button class="resource-link-btn secondary" onclick="downloadPDF('advanced')">
-                                            <i class="fas fa-download"></i> Download
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="resource-pane" id="pdfExtraPane">
-                                <div class="fallback-content" style="display: flex;">
-                                    <div class="fallback-icon">
-                                        <i class="fas fa-folder-open"></i>
-                                    </div>
-                                    <h4>Additional Resources</h4>
-                                    <p>More study materials for projectile motion</p>
-                                    <button class="control-btn" onclick="openExtraResources()">
-                                        <i class="fas fa-external-link-alt"></i> Browse
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="resize-handle" data-card="pdfCard">
-                            <i class="fas fa-arrows-alt-h"></i>
-                        </div>
-                    </div>
-
-                    <!-- Practical Simulations -->
-                    <div class="resource-frame" id="practicalCard" data-panel="right" data-index="1">
-                        <div class="size-indicator" id="practicalSize"></div>
-                        <div class="frame-header" id="practicalHeader">
-                            <h3><i class="fas fa-flask"></i> Simulations</h3>
-                            <div class="frame-controls">
-                                <button class="frame-btn" title="Switch" onclick="switchSimulation()">
-                                    <i class="fas fa-exchange-alt"></i>
-                                </button>
-                                <button class="frame-btn" title="Auto-Fit" onclick="autoFitCard('practicalCard')">
-                                    <i class="fas fa-crop-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="resource-tabs">
-                            <button class="resource-tab active" data-sim="motion">Motion</button>
-                            <button class="resource-tab" data-sim="data">Data Lab</button>
-                            <button class="resource-tab" data-sim="more">More</button>
-                        </div>
-
-                        <div class="resource-content">
-                            <div class="resource-pane active" id="simMotionPane">
-                                <div class="iframe-container">
-                                    <iframe src="https://phet.colorado.edu/sims/html/charges-and-fields/latest/charges-and-fields_all.html" title="Projectile Motion Simulation" id="simMotionIframe">
-                                    </iframe>
-                                    <div class="fallback-content" id="simMotionFallback" style="display: none;">
-                                        <div class="fallback-icon">
-                                            <i class="fas fa-bullseye"></i>
-                                        </div>
-                                        <h4>Motion Simulation</h4>
-                                        <p>Interactive simulation.</p>
-                                        <button class="control-btn" onclick="openSimulation('motion')">
-                                            <i class="fas fa-external-link-alt"></i> Open
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="resource-info">
-                                    <h5><i class="fas fa-bullseye"></i> Features:</h5>
-                                    <p>Adjust angle, velocity, mass. Visualize trajectory.</p>
-                                    <div class="resource-links">
-                                        <a href="https://phet.colorado.edu/sims/html/ohms-law/latest/ohms-law_all.html" target="_blank" class="resource-link-btn">
-                                            <i class="fas fa-external-link-alt"></i> Open
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="resource-pane" id="simDataPane">
-                                <div class="iframe-container">
-                                    <iframe src="https://phet.colorado.edu/sims/html/projectile-data-lab/latest/projectile-data-lab_all.html" title="Projectile Data Lab" id="simDataIframe">
-                                    </iframe>
-                                    <div class="fallback-content" id="simDataFallback" style="display: none;">
-                                        <div class="fallback-icon">
-                                            <i class="fas fa-chart-line"></i>
-                                        </div>
-                                        <h4>Data Lab</h4>
-                                        <p>Analyze data and graphs.</p>
-                                        <button class="control-btn" onclick="openSimulation('data')">
-                                            <i class="fas fa-external-link-alt"></i> Open
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="resource-info">
-                                    <h5><i class="fas fa-chart-line"></i> Features:</h5>
-                                    <p>Collect data, create graphs, analyze results.</p>
-                                    <div class="resource-links">
-                                        <a href="https://phet.colorado.edu/sims/html/projectile-data-lab/latest/projectile-data-lab_all.html" target="_blank" class="resource-link-btn">
-                                            <i class="fas fa-external-link-alt"></i> Open
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="resource-pane" id="simMorePane">
-                                <div class="fallback-content" style="display: flex;">
-                                    <div class="fallback-icon">
-                                        <i class="fas fa-cogs"></i>
-                                    </div>
-                                    <h4>More Simulations</h4>
-                                    <p>Additional interactive simulations</p>
-                                    <button class="control-btn" onclick="openMoreSimulations()">
-                                        <i class="fas fa-external-link-alt"></i> Browse
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="resize-handle" data-card="practicalCard">
-                            <i class="fas fa-arrows-alt-h"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- index2 link -->
+            <a class="lab-card" href="index2.html" target="_blank" rel="noopener">
+                <h2>
+                    <span>📈</span> index2.html
+                </h2>
+                <p>Determination of internal resistance of a cell</p>
+                <div class="badge">🔗 open experiment page 2</div>
+            </a>
         </div>
 
-        <!-- Compact Controls -->
-        <div class="controls">
-            <button class="control-btn" onclick="smartArrange()">
-                <i class="fas fa-brain"></i> Smart
-            </button>
-            <button class="control-btn outline" onclick="resetToDefault()">
-                <i class="fas fa-home"></i> Reset
-            </button>
-            <button class="control-btn outline" onclick="toggleSnapToGrid()">
-                <i class="fas fa-magnet" id="snapIcon"></i> 
-                <span id="snapText">Snap: ON</span>
-            </button>
+        <div class="footer-note">
+            ⚡ two separate HTML pages — <a href="index1.html">index1</a> · <a href="index2.html">index2</a>
+            <br><small style="opacity:0.7;">(click cards or text links to open each page)</small>
         </div>
-
-        <footer>
-            <p>MC EDUCATION &copy; 2023 | Auto-Arranging Cards System</p>
-        </footer>
     </div>
-
-    <script src="script.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MC Education · Potentiometer with variable E₀ | Mohan Chamod</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(145deg, #d9e2ec, #b8cfdc);
+            min-height: 100vh;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 32px;
+            padding: 22px 36px;
+            box-shadow: 0 12px 28px rgba(0, 20, 40, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            border: 1px solid rgba(0, 120, 200, 0.2);
+        }
+        
+        .institute h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            background: linear-gradient(145deg, #004466, #1a6d9e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .institute p {
+            color: #2c5778;
+            font-size: 1.1rem;
+        }
+        
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            background: #ebf3fa;
+            padding: 10px 32px 10px 18px;
+            border-radius: 60px;
+        }
+        
+        .profile img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #2c7da0;
+            background: #a9c9e0;
+        }
+        
+        .profile .name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #0b3b5a;
+        }
+        
+        .profile .role {
+            color: #2d5f7e;
+        }
+        
+        .grid-main {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+            align-items: start;
+        }
+        
+        .resize-card {
+            overflow: auto;
+            resize: horizontal;
+            min-width: 280px;
+            max-width: 100%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0, 20, 40, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            transition: box-shadow 0.1s;
+        }
+        
+        .resize-card:hover {
+            box-shadow: 0 25px 50px rgba(0, 60, 120, 0.3);
+        }
+        
+        .theory-card {
+            background: white;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+        
+        .theory-card h2 {
+            font-size: 2rem;
+            font-weight: 500;
+            color: #0f4b6e;
+            border-left: 10px solid #fcb045;
+            padding-left: 22px;
+        }
+        
+        .apparatus {
+            background: #e1effb;
+            border-radius: 30px;
+            padding: 18px 24px;
+            border-left: 6px solid #2a9d8f;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+        
+        .circuit-fig {
+            background: #e4eef6;
+            border-radius: 32px;
+            padding: 22px;
+            text-align: center;
+            border: 2px dashed #3b8cae;
+        }
+        
+        .image-control {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .image-control input {
+            width: 260px;
+            height: 10px;
+            border-radius: 20px;
+            accent-color: #2c7da0;
+        }
+        
+        .circuit-fig img {
+            max-width: 100%;
+            border-radius: 28px;
+            border: 3px solid white;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+            background: #b3cfee;
+            transition: width 0.1s;
+        }
+        
+        .collapsible {
+            background: #e8f0f9;
+            border-radius: 28px;
+            padding: 14px 22px;
+            border: 1px solid #a0c6e9;
+        }
+        
+        .collapsible summary {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #11577a;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .collapsible summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .collapsible summary::before {
+            content: '▶';
+            color: #2c7da0;
+            font-size: 1.4rem;
+            transition: transform 0.2s;
+        }
+        
+        .collapsible[open] summary::before {
+            content: '▼';
+        }
+        
+        .collapsible-content {
+            padding: 18px 6px 8px;
+            color: #134b6b;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+        
+        .collapsible-content ul,
+        .collapsible-content ol {
+            padding-left: 28px;
+        }
+        
+        .simu-card {
+            background: white;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .simu-card h2 {
+            font-size: 2rem;
+            color: #11577a;
+            border-left: 10px solid #f4b942;
+            padding-left: 22px;
+        }
+        /* New row for E₀ control */
+        
+        .e0-control {
+            background: #deecf7;
+            border-radius: 60px;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .e0-control label {
+            font-weight: 600;
+            color: #0f4b6e;
+            font-size: 1.2rem;
+        }
+        
+        .e0-control input {
+            width: 240px;
+            height: 10px;
+            accent-color: #2c7da0;
+        }
+        
+        .e0-control span {
+            background: #2c7da0;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-size: 1.2rem;
+        }
+        
+        .length-selector {
+            background: #deecf7;
+            border-radius: 50px;
+            padding: 14px 26px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .length-selector select {
+            background: #2c7da0;
+            color: white;
+            font-size: 1.2rem;
+            padding: 8px 22px;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .wire-visual {
+            position: relative;
+            margin: 10px 0;
+        }
+        
+        .wire-label {
+            display: flex;
+            justify-content: space-between;
+            color: #1a4c6e;
+            font-weight: 600;
+        }
+        
+        .wire-area {
+            background: #cbdbe9;
+            height: 48px;
+            border-radius: 60px;
+            margin: 8px 0 28px;
+            position: relative;
+            border: 3px solid #2f7ca0;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .wire-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f9c78b, #f7b050);
+            border-radius: 60px;
+            box-shadow: 0 0 15px #ffa726;
+            transition: width 0.1s;
+        }
+        
+        .jockey {
+            position: absolute;
+            top: -24px;
+            width: 18px;
+            height: 94px;
+            background: #6d6d6d;
+            border-radius: 30px;
+            transform: translateX(-50%);
+            border: 4px solid #f4b342;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
+        
+        .control-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            background: #e4f0fa;
+            border-radius: 70px;
+            padding: 22px 28px;
+        }
+        
+        .emf-sliders {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .slider-item label {
+            font-weight: 600;
+            color: #115a7a;
+        }
+        
+        input[type=range] {
+            width: 180px;
+            height: 8px;
+            background: #bed9f0;
+            border-radius: 20px;
+        }
+        
+        .cell-switch {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .cell-switch button {
+            background: #b3cee5;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: 2px solid #2c7da0;
+        }
+        
+        .cell-switch .active {
+            background: #f4b342;
+            border-color: #b26800;
+        }
+        
+        .galvano-box {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            background: #d4e6f5;
+            border-radius: 70px;
+            padding: 16px 28px;
+            flex-wrap: wrap;
+        }
+        
+        .gauge {
+            width: 100px;
+            height: 100px;
+            background: #d4e6f5;
+            border-radius: 50%;
+            border: 7px solid #1f618d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .needle {
+            width: 6px;
+            height: 46px;
+            background: #c0392b;
+            border-radius: 10px;
+            transform-origin: bottom center;
+            transform: rotate(0deg) translateY(-8px);
+            transition: transform 0.1s;
+        }
+        
+        .balance-info {
+            background: #c5dff2;
+            padding: 14px 28px;
+            border-radius: 60px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #0b3b5a;
+        }
+        
+        .graphical-card {
+            background: #e1effa;
+            border-radius: 48px;
+            padding: 26px;
+            border: 3px solid #f4b342;
+            margin-top: 10px;
+        }
+        
+        .resistance-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 22px;
+            margin: 15px 0;
+        }
+        
+        .store-btn {
+            background: #f4b342;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #b26700;
+        }
+        
+        .store-btn:active {
+            transform: translateY(5px);
+            box-shadow: none;
+        }
+        
+        .stored-points {
+            background: #c6dff5;
+            border-radius: 40px;
+            padding: 16px;
+            max-height: 120px;
+            overflow-y: auto;
+            border: 2px solid #2c7da0;
+            margin: 16px 0;
+        }
+        
+        .graph-container {
+            background: white;
+            border-radius: 36px;
+            padding: 16px;
+            border: 3px solid #2c7da0;
+        }
+        
+        canvas {
+            width: 100%;
+            height: auto;
+            background: #f6faff;
+            border-radius: 24px;
+            border: 2px solid #7ab0d6;
+        }
+        
+        .slope-result {
+            background: #156085;
+            color: white;
+            padding: 16px 30px;
+            border-radius: 60px;
+            font-size: 1.7rem;
+            font-weight: 600;
+            margin-top: 18px;
+        }
+        
+        .footer {
+            background: white;
+            border-radius: 40px;
+            padding: 18px 32px;
+            text-align: center;
+            color: #1a5779;
+            border: 2px solid #c9ddec;
+            margin-top: 10px;
+        }
+        
+        .image-note {
+            background: #fcf2da;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #785b2c;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="institute">
+                <h1>⚡ MC Education</h1>
+                <p>potentiometer lab · Mohan Chamod</p>
+            </div>
+            <div class="profile">
+                <img src="my.jpg" alt="Mohan" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22%233b8cae%22%2F%3E%3Ctext%20x%3D%2250%22%20y%3D%2265%22%20font-size%3D%2245%22%20text-anchor%3D%22middle%22%20fill%3D%22white%22%20dy%3D%22.3em%22%3EMC%3C%2Ftext%3E%3C%2Fsvg%3E';">
+                <div>
+                    <div class="name">Mohan Chamod</div>
+                    <div class="role">lab instructor</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-main">
+            <!-- left card -->
+            <div class="resize-card theory-card">
+                <h2>📘 Theory & docs</h2>
+                <div class="apparatus">
+                    <strong>▪️ components:</strong> accumulator (E₀ variable), Leclanché (E₁), Daniell (E₂), galvanometer, two‑way switch, keys, 5kΩ resistor, resistance box, jockey, wire 1‑4m.
+                </div>
+
+                <!-- resizable circuit image (with bigger range) -->
+                <div class="circuit-fig">
+                    <div class="image-control">
+                        <label>🔍 image size <span id="imgSizeVal">100</span>%</label>
+                        <input type="range" id="imgSizeSlider" min="20" max="300" value="100" step="5">
+                    </div>
+                    <img src="circuit.PNG" id="circuitImage" alt="circuit diagram" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22180%22%20viewBox%3D%220%200%20400%20180%22%3E%3Crect%20width%3D%22400%22%20height%3D%22180%22%20fill%3D%22%23d0e2f0%22%2F%3E%3Ctext%20x%3D%2220%22%20y%3D%2240%22%20fill%3D%22%231f4b6e%22%20font-size%3D%2216%22%3E%5Bcircuit.PNG%20-%20potentiometer%20with%20R-box%5D%3C%2Ftext%3E%3Ctext%20x%3D%2220%22%20y%3D%2280%22%20fill%3D%22%23255d8c%22%3EE%E2%82%80%20%7C%20R%20series%20%7C%20A%20...%20B%3C%2Ftext%3E%3C%2Fsvg%3E';"
+                        style="width:100%; height:auto;">
+                    <p style="color:#0f4b6e;">Figure 33.1 + resistance box</p>
+                </div>
+
+                <details class="collapsible" open>
+                    <summary>📐 Theory</summary>
+                    <div class="collapsible-content">
+                        If l₁ balance for E₁ and l₂ for E₂, then E₁/E₂ = l₁/l₂. For graphical method, vary R and plot l₁ vs l₂ → slope = E₁/E₂. E₀ (accumulator) can be adjusted.
+                    </div>
+                </details>
+                <details class="collapsible">
+                    <summary>🔧 Procedure</summary>
+                    <div class="collapsible-content">
+                        <ol>
+                            <li>Set up circuit, close K₁, K₂ open.</li>
+                            <li>Connect two‑way to E₁. Touch A & B: opposite deflections = correct.</li>
+                            <li>Find rough balance (K₂ open), then accurate (K₂ closed). Measure l₁.</li>
+                            <li>Repeat for E₂ → l₂.</li>
+                            <li>For graphical: insert resistance box, record (l₁,l₂) for different R.</li>
+                            <li>Plot l₁ vs l₂, slope gives E₁/E₂.</li>
+                        </ol>
+                    </div>
+                </details>
+                <details class="collapsible">
+                    <summary>💬 Discussion & precautions</summary>
+                    <div class="collapsible-content">
+                        <ul>
+                            <li>E₀ must exceed E₁ and E₂ (adjust with slider).</li>
+                            <li>Opposite deflections at A & B confirm polarity; otherwise reverse or check connections.</li>
+                            <li>Use 5kΩ resistor to protect galvanometer.</li>
+                            <li>Clean jockey and wire.</li>
+                            <li>Graphical method minimises random errors.</li>
+                            <li>If no deflection, check for loose wires or discharged E₀.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+
+            <!-- right card -->
+            <div class="resize-card simu-card">
+                <h2>🎛️ Potentiometer simulator</h2>
+
+                <!-- new E₀ control -->
+                <div class="e0-control">
+                    <label>🔋 E₀ (accumulator) <span id="e0Val">2.0</span> V</label>
+                    <input type="range" id="e0Slider" min="1.2" max="3.0" value="2.0" step="0.05">
+                    <span id="e0Display">2.0 V</span>
+                </div>
+
+                <div class="length-selector">
+                    <label>📏 wire length:</label>
+                    <select id="wireLengthSelect">
+                    <option value="1">1 metre (100 cm)</option>
+                    <option value="2" selected>2 metres (200 cm)</option>
+                    <option value="3">3 metres (300 cm)</option>
+                    <option value="4">4 metres (400 cm)</option>
+                </select>
+                    <span style="font-weight:600;" id="lengthDisplay">200 cm</span>
+                </div>
+
+                <div class="wire-visual">
+                    <div class="wire-label">
+                        <span>A (0)</span>
+                        <span>B (<span id="maxLen">200</span> cm)</span>
+                    </div>
+                    <div class="wire-area">
+                        <div class="wire-fill" id="wireFill" style="width:0%"></div>
+                        <div class="jockey" id="jockey" style="left:0%"></div>
+                    </div>
+                </div>
+                <div style="margin:5px 0;">
+                    <label>jockey position (cm) <span id="posDisplay">0.0</span></label>
+                    <input type="range" id="jockeySlider" min="0" max="100" value="0" step="0.1" style="width:100%;">
+                </div>
+
+                <div class="control-panel">
+                    <div class="emf-sliders">
+                        <div class="slider-item">
+                            <label>🔋 E₁ <span id="e1val">1.5</span> V</label>
+                            <input type="range" id="e1slide" min="0.2" max="1.9" value="1.5" step="0.01">
+                        </div>
+                        <div class="slider-item">
+                            <label>🟨 E₂ <span id="e2val">1.1</span> V</label>
+                            <input type="range" id="e2slide" min="0.2" max="1.9" value="1.1" step="0.01">
+                        </div>
+                    </div>
+                    <div class="cell-switch">
+                        <button id="btnE1" class="active">E₁</button>
+                        <button id="btnE2">E₂</button>
+                    </div>
+                </div>
+
+                <div class="galvano-box">
+                    <div class="gauge">
+                        <div class="needle" id="needle" style="transform:rotate(0deg)"></div>
+                    </div>
+                    <div id="deflectDir" style="font-size:1.3rem;">⚫ zero</div>
+                    <div class="balance-info">l₁:<span id="bal1">150.0</span> l₂:<span id="bal2">110.0</span></div>
+                </div>
+
+                <div class="graphical-card">
+                    <div style="font-size:1.8rem; color:#11577a;">📈 graphical analysis</div>
+                    <div class="resistance-row">
+                        <label>🔁 R series (Ω): <span id="rVal">10.0</span></label>
+                        <input type="range" id="rSlider" min="1" max="100" value="10" step="0.5" style="flex:1;">
+                        <button class="store-btn" id="storeBtn">⏺ STORE</button>
+                        <button class="store-btn" id="clearBtn" style="background:#7fb4d3;">🗑 CLEAR</button>
+                    </div>
+                    <div style="margin:8px 0;">R=<span id="rShow">10.0</span>Ω → l₁=<span id="curL1">150.0</span>, l₂=<span id="curL2">110.0</span></div>
+                    <div class="stored-points" id="pointsList"><em>stored (l₂,l₁) pairs appear here</em></div>
+                    <div class="graph-container">
+                        <canvas id="graphCanvas" width="500" height="260" style="width:100%; height:auto;"></canvas>
+                    </div>
+                    <div class="slope-result" id="slopeDisplay">slope (E₁/E₂) = 1.364</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            MC Education – Mohan Chamod – card layout, variable E₀ (1.2‑3.0V), image size up to 300%
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // DOM elements
+            const e0Slider = document.getElementById('e0Slider');
+            const e0Val = document.getElementById('e0Val');
+            const e0Display = document.getElementById('e0Display');
+
+            const e1slide = document.getElementById('e1slide');
+            const e2slide = document.getElementById('e2slide');
+            const e1val = document.getElementById('e1val');
+            const e2val = document.getElementById('e2val');
+            const bal1 = document.getElementById('bal1');
+            const bal2 = document.getElementById('bal2');
+            const jockeySlider = document.getElementById('jockeySlider');
+            const posDisplay = document.getElementById('posDisplay');
+            const jockey = document.getElementById('jockey');
+            const wireFill = document.getElementById('wireFill');
+            const needle = document.getElementById('needle');
+            const deflectDir = document.getElementById('deflectDir');
+            const btnE1 = document.getElementById('btnE1');
+            const btnE2 = document.getElementById('btnE2');
+            const rSlider = document.getElementById('rSlider');
+            const rVal = document.getElementById('rVal');
+            const rShow = document.getElementById('rShow');
+            const curL1 = document.getElementById('curL1');
+            const curL2 = document.getElementById('curL2');
+            const storeBtn = document.getElementById('storeBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const pointsList = document.getElementById('pointsList');
+            const slopeDisplay = document.getElementById('slopeDisplay');
+            const canvas = document.getElementById('graphCanvas');
+            const ctx = canvas.getContext('2d');
+            const wireLengthSelect = document.getElementById('wireLengthSelect');
+            const maxLenSpan = document.getElementById('maxLen');
+            const lengthDisplay = document.getElementById('lengthDisplay');
+            const imgSizeSlider = document.getElementById('imgSizeSlider');
+            const imgSizeVal = document.getElementById('imgSizeVal');
+            const circuitImage = document.getElementById('circuitImage');
+
+            // state
+            let E0 = 2.0; // variable E₀
+            let E1 = 1.5,
+                E2 = 1.1;
+            let baseRwPerMetre = 5; // 5 ohm per metre
+            let Rseries = 10.0;
+            let selectedCell = 'E1';
+            let points = [];
+
+            function getLengthParams() {
+                let metres = parseFloat(wireLengthSelect.value);
+                let L_cm = metres * 100;
+                let Rw_actual = baseRwPerMetre * metres;
+                return {
+                    L: L_cm,
+                    Rw: Rw_actual,
+                    metres
+                };
+            }
+
+            function computeLengths() {
+                let {
+                    L,
+                    Rw
+                } = getLengthParams();
+                let factor = L * (Rseries + Rw) / (E0 * Rw);
+                let l1 = E1 * factor;
+                let l2 = E2 * factor;
+                return {
+                    l1,
+                    l2,
+                    L
+                };
+            }
+
+            function updateAll() {
+                // read all sliders
+                E0 = parseFloat(e0Slider.value);
+                E1 = parseFloat(e1slide.value);
+                E2 = parseFloat(e2slide.value);
+                Rseries = parseFloat(rSlider.value);
+
+                e0Val.textContent = E0.toFixed(2);
+                e0Display.textContent = E0.toFixed(2) + ' V';
+                e1val.textContent = E1.toFixed(2);
+                e2val.textContent = E2.toFixed(2);
+                rVal.textContent = Rseries.toFixed(1);
+                rShow.textContent = Rseries.toFixed(1);
+
+                let {
+                    l1,
+                    l2,
+                    L
+                } = computeLengths();
+                bal1.textContent = l1.toFixed(1);
+                bal2.textContent = l2.toFixed(1);
+                curL1.textContent = l1.toFixed(1);
+                curL2.textContent = l2.toFixed(1);
+                maxLenSpan.textContent = L;
+                lengthDisplay.textContent = L + ' cm';
+
+                let jockeyPercent = parseFloat(jockeySlider.value);
+                let jockeyPos_cm = (jockeyPercent / 100) * L;
+                posDisplay.textContent = jockeyPos_cm.toFixed(1);
+                jockey.style.left = jockeyPercent + '%';
+                wireFill.style.width = jockeyPercent + '%';
+
+                let target = (selectedCell === 'E1') ? l1 : l2;
+                let diff = jockeyPos_cm - target;
+                let angle = diff * 0.7;
+                const maxAngle = 30;
+                if (angle > maxAngle) angle = maxAngle;
+                if (angle < -maxAngle) angle = -maxAngle;
+                if (Math.abs(diff) < 0.3) angle = 0;
+                needle.style.transform = `rotate(${angle}deg) translateY(-8px)`;
+
+                if (Math.abs(diff) < 0.3) deflectDir.innerHTML = '⚫ BALANCED';
+                else if (diff > 0) deflectDir.innerHTML = '🔴 → B';
+                else deflectDir.innerHTML = '🔵 → A';
+
+                drawGraph();
+            }
+
+            function drawGraph() {
+                const w = canvas.width,
+                    h = canvas.height;
+                ctx.clearRect(0, 0, w, h);
+                if (points.length === 0) {
+                    ctx.font = '16px Inter';
+                    ctx.fillStyle = '#134b6b';
+                    ctx.fillText('no stored points', 40, 130);
+                    slopeDisplay.textContent = 'slope (E₁/E₂) = ---';
+                    return;
+                }
+
+                let maxL = 0;
+                points.forEach(p => {
+                    if (p.l1 > maxL) maxL = p.l1;
+                    if (p.l2 > maxL) maxL = p.l2;
+                });
+                maxL = Math.ceil(maxL * 1.1);
+                const pad = 50;
+                const xScale = (w - 2 * pad) / maxL;
+                const yScale = (h - 2 * pad) / maxL;
+
+                ctx.beginPath();
+                ctx.strokeStyle = '#2c7da0';
+                ctx.lineWidth = 3;
+                ctx.moveTo(pad, h - pad);
+                ctx.lineTo(w - pad, h - pad);
+                ctx.moveTo(pad, h - pad);
+                ctx.lineTo(pad, pad);
+                ctx.stroke();
+
+                ctx.fillStyle = '#0b3b5a';
+                ctx.fillText('l₂ (cm)', w / 2 - 30, h - 15);
+                ctx.save();
+                ctx.translate(30, h / 2);
+                ctx.rotate(-Math.PI / 2);
+                ctx.fillText('l₁ (cm)', -15, 0);
+                ctx.restore();
+
+                points.forEach(p => {
+                    let x = pad + p.l2 * xScale;
+                    let y = h - pad - p.l1 * yScale;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 8, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#f4b342';
+                    ctx.shadowColor = '#f4b342';
+                    ctx.shadowBlur = 15;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                });
+
+                let sum_l2l1 = 0,
+                    sum_l2l2 = 0;
+                points.forEach(p => {
+                    sum_l2l1 += p.l2 * p.l1;
+                    sum_l2l2 += p.l2 * p.l2;
+                });
+                let slope = sum_l2l2 !== 0 ? sum_l2l1 / sum_l2l2 : 0;
+                slopeDisplay.textContent = `slope (E₁/E₂) = ${slope.toFixed(4)}`;
+
+                if (points.length > 0 && maxL > 0) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#e68c2e';
+                    ctx.lineWidth = 5;
+                    ctx.setLineDash([8, 6]);
+                    let x1 = pad,
+                        y1 = h - pad;
+                    let x2 = pad + maxL * xScale;
+                    let y2 = h - pad - (maxL * slope) * yScale;
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
+
+            function updatePointsList() {
+                if (points.length === 0) {
+                    pointsList.innerHTML = '<em>stored (l₂,l₁) pairs appear here</em>';
+                    return;
+                }
+                let html = '<div style="display:flex; flex-wrap:wrap; gap:10px;">';
+                points.forEach(p => {
+                    html += `<span style="background:#c4dff7; padding:6px 14px; border-radius:40px;">l₂=${p.l2.toFixed(1)} l₁=${p.l1.toFixed(1)}</span>`;
+                });
+                html += '</div>';
+                pointsList.innerHTML = html;
+            }
+
+            function storePoint() {
+                let {
+                    l1,
+                    l2
+                } = computeLengths();
+                points.push({
+                    l1,
+                    l2
+                });
+                updatePointsList();
+                drawGraph();
+            }
+
+            function clearPoints() {
+                points = [];
+                updatePointsList();
+                drawGraph();
+            }
+
+            // wire length change
+            wireLengthSelect.addEventListener('change', () => {
+                jockeySlider.value = 0;
+                updateAll();
+            });
+
+            // image resize (up to 300%)
+            imgSizeSlider.addEventListener('input', (e) => {
+                let percent = e.target.value;
+                imgSizeVal.textContent = percent;
+                circuitImage.style.width = percent + '%';
+            });
+
+            // event listeners
+            e0Slider.addEventListener('input', updateAll);
+            e1slide.addEventListener('input', updateAll);
+            e2slide.addEventListener('input', updateAll);
+            rSlider.addEventListener('input', updateAll);
+            jockeySlider.addEventListener('input', updateAll);
+
+            btnE1.addEventListener('click', () => {
+                selectedCell = 'E1';
+                btnE1.classList.add('active');
+                btnE2.classList.remove('active');
+                updateAll();
+            });
+            btnE2.addEventListener('click', () => {
+                selectedCell = 'E2';
+                btnE2.classList.add('active');
+                btnE1.classList.remove('active');
+                updateAll();
+            });
+            storeBtn.addEventListener('click', storePoint);
+            clearBtn.addEventListener('click', clearPoints);
+
+            updateAll();
+            drawGraph();
+        })();
+    </script>
+    <!-- small reminder about images -->
+    <div style="max-width:1600px; margin:10px auto 0; padding:6px 16px; background:#fdf0d8; border-radius:40px; color:#7b5f2e;">
+        📁 place <strong>circuit.PNG</strong> and <strong>my.jpg</strong> in the same folder for actual images.
+    </div>
+</body>
+
+</html>

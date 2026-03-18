@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MC Education · internal resistance · full experiment</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        
+        body {
+            background: #c0d9f0;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .master-container {
+            max-width: 1600px;
+            width: 100%;
+            background: #ecf3fa;
+            border-radius: 64px;
+            box-shadow: 0 30px 50px -18px #1c405b, inset 0 2px 6px #ffffff;
+            padding: 30px 32px 38px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+        
+        .header-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 15px;
+        }
+        
+        .institute-badge {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #0b2a48;
+            padding: 8px 40px 8px 28px;
+            border-radius: 80px;
+            color: white;
+        }
+        
+        .institute-badge h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+        
+        .institute-badge span {
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .instructor {
+            display: flex;
+            align-items: center;
+            background: #ffffffd9;
+            border-radius: 50px;
+            padding: 6px 20px 6px 10px;
+            border: 1px solid #b7d0ec;
+            gap: 12px;
+            box-shadow: 0 8px 14px -12px #0e2d48;
+        }
+        
+        .instructor-img {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            background: #e1ecfe;
+        }
+        
+        .name {
+            font-weight: 700;
+            color: #103457;
+        }
+        
+        .name small {
+            font-size: 0.8rem;
+            color: #38668f;
+        }
+        
+        .experiment-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+        }
+        
+        .left-docs {
+            flex: 1.2;
+            min-width: 380px;
+            background: #f7fbfe;
+            border-radius: 48px;
+            padding: 28px 26px;
+            box-shadow: inset 0 2px 10px #ffffff, 0 20px 30px -18px #163e5b;
+        }
+        
+        .right-sim {
+            flex: 2;
+            min-width: 580px;
+            background: #ffffffd9;
+            backdrop-filter: blur(6px);
+            border-radius: 56px;
+            padding: 28px 26px;
+            border: 1px solid white;
+            box-shadow: 0 20px 30px -18px #123853;
+        }
+        /* Image containers */
+        
+        .circuit-image-container {
+            background: #e4ebf5;
+            border-radius: 38px;
+            padding: 20px;
+            text-align: center;
+            border: 3px solid #1e6ec7;
+            margin: 20px 0 30px;
+        }
+        
+        .circuit-image-container img {
+            max-width: 100%;
+            max-height: 220px;
+            border-radius: 30px;
+            box-shadow: 0 12px 24px -12px #0a2a48;
+            background: white;
+            object-fit: contain;
+        }
+        
+        .fig-ref {
+            font-weight: 600;
+            color: #1d4d7c;
+            margin-top: 12px;
+            font-size: 1rem;
+        }
+        
+        .image-placeholder-text {
+            background: #fff3d4;
+            border-radius: 40px;
+            padding: 8px 18px;
+            display: inline-block;
+            margin-top: 12px;
+            color: #a64a2a;
+            font-size: 0.9rem;
+        }
+        /* Battery selector */
+        
+        .battery-selector {
+            background: #d6e6ff;
+            border-radius: 48px;
+            padding: 20px 24px;
+            margin-bottom: 25px;
+            border: 1px solid #a3c0e0;
+        }
+        
+        .selector-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #103256;
+            margin-bottom: 15px;
+        }
+        
+        .battery-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        
+        .bat-card {
+            background: white;
+            border-radius: 38px;
+            padding: 14px 24px;
+            flex: 1 1 auto;
+            cursor: pointer;
+            border: 2px solid transparent;
+            box-shadow: 0 6px 12px -10px #274e7c;
+            transition: all 0.2s;
+            font-weight: 600;
+            min-width: 140px;
+        }
+        
+        .bat-card.selected {
+            border: 3px solid #1e6ec7;
+            background: #e2f0ff;
+            transform: scale(1.02);
+            box-shadow: 0 12px 18px -12px #15487a;
+        }
+        
+        .custom-bat {
+            background: #f8f3e0;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .custom-bat input {
+            width: 90px;
+            padding: 10px;
+            border-radius: 40px;
+            border: 1px solid #acccf0;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .galvo-container {
+            background: #263f5c;
+            border-radius: 42px;
+            padding: 18px 20px;
+            color: white;
+            margin: 20px 0 25px;
+        }
+        
+        .center-zero-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .meter-box {
+            background: #eadbc4;
+            border-radius: 40px;
+            padding: 12px;
+        }
+        
+        canvas#galvoCanvas {
+            width: 180px;
+            height: 100px;
+            background: #fffef7;
+            border-radius: 26px;
+        }
+        
+        .balance-indicator {
+            background: #2f6d4c;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+        
+        .pot-wire {
+            background: #876e48;
+            height: 18px;
+            border-radius: 40px;
+            margin: 30px 0 20px;
+            position: relative;
+            box-shadow: 0 4px 0 #53412b, 0 8px 12px #00000036;
+            cursor: pointer;
+        }
+        
+        .wire-filled {
+            height: 18px;
+            width: 0%;
+            background: linear-gradient(90deg, #c9a668, #f8dfa8, #c9a668);
+            border-radius: 40px;
+            transition: width 0.08s;
+        }
+        
+        .jockey {
+            position: absolute;
+            top: -12px;
+            width: 10px;
+            height: 42px;
+            background: #3e4568;
+            border-radius: 12px;
+            transform: translateX(-50%);
+            box-shadow: 0 6px 0 #242941;
+            transition: left 0.08s;
+            border: 1px solid white;
+        }
+        
+        .l-scale {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            color: #3f321e;
+        }
+        
+        .param-sliders {
+            background: #eaf2fc;
+            border-radius: 36px;
+            padding: 22px;
+            margin: 20px 0;
+        }
+        
+        .sl-item {
+            margin-bottom: 18px;
+        }
+        
+        .sl-item label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            color: #1b4a75;
+        }
+        
+        input[type=range] {
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, #1f6290, #9ac6f0);
+            border-radius: 30px;
+            -webkit-appearance: none;
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 28px;
+            height: 28px;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid #1960aa;
+        }
+        
+        .value-badge {
+            background: #123a5a;
+            color: white;
+            padding: 4px 24px;
+            border-radius: 40px;
+            font-size: 1.3rem;
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            background: white;
+            border: 1.5px solid #acc6e3;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-weight: 600;
+            color: #103f68;
+            flex: 1 0 auto;
+            cursor: pointer;
+        }
+        
+        .btn.primary {
+            background: #1e6ec7;
+            color: white;
+            border-color: #0b3f6b;
+        }
+        
+        .table-wrap {
+            max-height: 220px;
+            overflow-y: auto;
+            border-radius: 28px;
+            background: #e9f0fa;
+            margin: 15px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        th {
+            background: #1a4972;
+            color: white;
+            padding: 10px 3px;
+        }
+        
+        td {
+            background: #f6faff;
+            padding: 8px 3px;
+            text-align: center;
+        }
+        
+        canvas#graphCanvas {
+            width: 100%;
+            height: auto;
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 8px;
+            margin: 12px 0;
+        }
+        
+        .result-card {
+            background: #c7defa;
+            border-radius: 36px;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            font-weight: 600;
+        }
+        
+        .rbig {
+            background: #123457;
+            color: white;
+            padding: 8px 38px;
+            border-radius: 60px;
+            font-size: 2.2rem;
+        }
+        
+        .footnote {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            background: #fff4d2;
+            border-radius: 30px;
+            padding: 8px 25px;
+        }
+        
+        .theory-block,
+        .procedure-block,
+        .discussion-block {
+            background: #ffffffb8;
+            border-radius: 36px;
+            padding: 22px 26px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 16px -18px #163247;
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #113256;
+            border-left: 12px solid #1e6ec7;
+            padding-left: 18px;
+            margin: 25px 0 20px;
+        }
+        
+        .equation {
+            background: #deecfd;
+            padding: 12px 26px;
+            border-radius: 50px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.3rem;
+            margin: 16px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="master-container">
+        <!-- Header with my.jpg image -->
+        <div class="header-row">
+            <div class="institute-badge">
+                <h1>⚡ MC Education</h1>
+                <span>experiment 34 · internal resistance</span>
+            </div>
+            <div class="instructor">
+                <!-- my.jpg image using img src -->
+                <img src="my.jpg" alt="Mohan Chamod" class="instructor-img" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22 fill=%22%232266aa%22><circle cx=%2250%22 cy=%2240%22 r=%2230%22 fill=%22%233a6ea5%22/><circle cx=%2250%22 cy=%2285%22 r=%2230%22 fill=%22%232a5a8c%22/><text x=%2230%22 y=%2260%22 fill=%22white%22 font-size=%2230%22>MC</text></svg>';">
+                <div class="name">Mohan Chamod<br><small>instructor · my.jpg</small></div>
+            </div>
+        </div>
+
+        <div class="experiment-grid">
+            <!-- LEFT: circuit.PNG, theory, battery selector -->
+            <div class="left-docs">
+                <div class="section-title">📘 Circuit diagram</div>
+
+                <!-- circuit.PNG image using img src -->
+                <div class="circuit-image-container">
+                    <img src="circuit1.PNG" alt="Figure 34.1 - Potentiometer circuit" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22180%22 viewBox=%220 0 300 180%22><rect width=%22300%22 height=%22180%22 fill=%22%23e9f2fa%22 rx=%2220%22/><text x=%2220%22 y=%2235%22 fill=%22%231e4d7a%22 font-size=%2214%22>⚠️ circuit.PNG not found</text><text x=%2220%22 y=%2260%22 fill=%22%23a64a2a%22>place your image in same folder</text><line x1=%2240%22 y1=%2290%22 x2=%2240%22 y2=%22120%22 stroke=%22%23333%22 stroke-width=%222%22/><line x1=%2230%22 y1=%22105%22 x2=%2250%22 y2=%22105%22 stroke=%22%23333%22 stroke-width=%222%22/><text x=%2220%22 y=%2280%22 fill=%22%231c3f64%22>2V</text><line x1=%2280%22 y1=%2290%22 x2=%2280%22 y2=%22120%22 stroke=%22%23333%22 stroke-width=%222%22/><line x1=%2275%22 y1=%22105%22 x2=%2285%22 y2=%22105%22 stroke=%22%23333%22 stroke-width=%223%22/><text x=%2270%22 y=%2280%22 fill=%22%231c3f64%22>E</text><rect x=%22120%22 y=%2290%22 width=%2240%22 height=%2230%22 fill=%22%23d4e0f0%22 stroke=%22%231f4970%22 rx=%226%22/><text x=%22130%22 y=%22112%22 fill=%22%231f4970%22>R</text><circle cx=%22180%22 cy=%22105%22 r=%2210%22 fill=%22white%22 stroke=%22%231f4970%22 stroke-width=%222%22/><text x=%22175%22 y=%2290%22 fill=%22%231f4970%22>K₁</text><circle cx=%22220%22 cy=%22105%22 r=%2210%22 fill=%22white%22 stroke=%22%231f4970%22 stroke-width=%222%22/><text x=%22215%22 y=%2290%22 fill=%22%231f4970%22>K₂</text><line x1=%2250%22 y1=%22145%22 x2=%22250%22 y2=%22145%22 stroke=%22%238b6f47%22 stroke-width=%226%22/><circle cx=%22270%22 cy=%22105%22 r=%2214%22 fill=%22%23b3c7e3%22 stroke=%22%231f3b5c%22 stroke-width=%222%22/><text x=%22265%22 y=%22110%22 fill=%22%231f3b5c%22>G</text></svg>';"
+                        style="max-width:100%; max-height:220px; border-radius:30px;">
+                    <div class="fig-ref">Figure 34.1: Potentiometer circuit (circuit.PNG)</div>
+                    <div class="image-placeholder-text">Replace with your actual circuit.PNG</div>
+                </div>
+
+                <!-- Battery selector -->
+                <div class="battery-selector">
+                    <div class="selector-title">🔋 Select battery to measure</div>
+                    <div class="battery-options" id="batteryOptions">
+                        <div class="bat-card selected" data-e="1.52" data-r="0.82" data-name="Dry cell">🔋 Dry cell <small>1.52V / 0.82Ω</small></div>
+                        <div class="bat-card" data-e="2.10" data-r="0.45" data-name="Lead-acid">⚡ Lead acid <small>2.0V / 0.45Ω</small></div>
+                        <div class="bat-card" data-e="1.25" data-r="0.08" data-name="Ni-MH">🔋 Ni-MH <small>1.25V / 0.08Ω</small></div>
+                        <div class="bat-card" data-e="1.55" data-r="0.35" data-name="Alkaline">🔋 Alkaline <small>1.55V / 0.35Ω</small></div>
+                        <div class="bat-card custom-bat" id="customBatCard">
+                            <span>🔧 custom</span>
+                            <input type="number" id="customE" value="1.65" step="0.01" min="0.8" max="3.0" placeholder="E (V)">
+                            <input type="number" id="customRtrue" value="0.60" step="0.01" min="0.01" max="2.0" placeholder="r (Ω)">
+                        </div>
+                    </div>
+                    <div style="margin-top: 18px; font-size: 1.1rem;" id="selectedBatDisplay">Selected: Dry cell (E=1.52V, r=0.82Ω)</div>
+                </div>
+
+                <div class="theory-block">
+                    <h3>📐 Theory</h3>
+                    <p>For a cell with emf <i>E</i> and internal resistance <i>r</i>, terminal voltage <i>V = E·R/(R+r)</i>.</p>
+                    <p>Potentiometer: <i>V = K·l</i> → <i>1/l = (K·r/E)(1/R) + K/E</i></p>
+                    <div class="equation">r = gradient / intercept (from 1/l vs 1/R plot)</div>
+                </div>
+
+                <div class="procedure-block">
+                    <h3>🔬 Procedure</h3>
+                    <ol>
+                        <li>Set up circuit as in circuit.PNG (Figure 34.1)</li>
+                        <li>Select battery and set R = 50Ω</li>
+                        <li>Find balance point by sliding jockey (click on wire)</li>
+                        <li>Record R and l in table</li>
+                        <li>Reduce R by 5Ω, repeat until 20Ω</li>
+                        <li>Plot graph and compute r</li>
+                    </ol>
+                </div>
+
+                <div class="discussion-block">
+                    <h3>💬 Discussion</h3>
+                    <p>The measured r should match the battery's true internal resistance. The centre-zero galvanometer increases accuracy. Different battery types show different internal resistances.</p>
+                </div>
+            </div>
+
+            <!-- RIGHT: simulator (unchanged) -->
+            <div class="right-sim">
+                <h2 style="margin-top:0;">⚙️ Interactive simulator</h2>
+
+                <div class="galvo-container">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>⓿ centre‑zero galvanometer</span>
+                        <span>click wire to move jockey</span>
+                    </div>
+                    <div class="center-zero-panel">
+                        <div class="meter-box">
+                            <canvas id="galvoCanvas" width="200" height="100"></canvas>
+                        </div>
+                        <div class="balance-indicator" id="balanceMsg">⚖️ not balanced</div>
+                    </div>
+                </div>
+
+                <div style="margin: 10px 0 5px;">
+                    <span><b>Potentiometer wire 0–100 cm</b></span>
+                    <span style="background:#0b2945; color:white; border-radius:30px; padding:4px 22px; margin-left:20px;" id="lDisplay">l = --.- cm</span>
+                </div>
+                <div class="pot-wire" id="wireClickArea">
+                    <div class="wire-filled" id="wireFill" style="width:50%;"></div>
+                    <div class="jockey" id="jockey" style="left:50%;"></div>
+                </div>
+                <div class="l-scale">
+                    <span>0</span><span>20</span><span>40</span><span>60</span><span>80</span><span>100 cm</span>
+                </div>
+
+                <div class="param-sliders">
+                    <div class="sl-item">
+                        <label>📏 Constant K (V/cm) <span id="Kval" class="value-badge">0.085</span></label>
+                        <input type="range" id="Kslider" min="0.040" max="0.150" value="0.085" step="0.001">
+                    </div>
+                    <div class="sl-item">
+                        <label>⚡ External R (Ω) <span id="Rval" class="value-badge">50.0</span></label>
+                        <input type="range" id="Rslider" min="5" max="50" value="50" step="0.5">
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn" id="addReadingBtn">➕ add reading</button>
+                    <button class="btn" id="resetTableBtn">🗑️ reset table</button>
+                    <button class="btn primary" id="recalcBtn">📈 update graph</button>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>R (Ω)</th>
+                                <th>l (cm)</th>
+                                <th>1/R</th>
+                                <th>1/l</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+                <canvas id="graphCanvas" width="500" height="240"></canvas>
+
+                <div class="result-card">
+                    <span>Internal resistance r =</span>
+                    <span class="rbig" id="rDisplay">0.851</span>
+                    <span>Ω</span>
+                </div>
+                <div id="giDisplay" style="margin-top:8px; color:#15456e;">gradient: — , intercept: —</div>
+                <div class="footnote">🔔 Images: my.jpg (instructor) and circuit.PNG loaded via &lt;img src&gt;</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Battery state
+            let data = [];
+            let currentBattery = {
+                name: 'Dry cell',
+                E: 1.52,
+                rTrue: 0.82
+            };
+
+            // DOM elements
+            const Kslider = document.getElementById('Kslider');
+            const Rslider = document.getElementById('Rslider');
+            const Kval = document.getElementById('Kval');
+            const Rval = document.getElementById('Rval');
+            const lDisplay = document.getElementById('lDisplay');
+            const wireFill = document.getElementById('wireFill');
+            const jockey = document.getElementById('jockey');
+            const wireArea = document.getElementById('wireClickArea');
+            const galvoCanvas = document.getElementById('galvoCanvas');
+            const balanceMsg = document.getElementById('balanceMsg');
+            const tableBody = document.getElementById('tableBody');
+            const rDisplay = document.getElementById('rDisplay');
+            const giDisplay = document.getElementById('giDisplay');
+            const graphCanvas = document.getElementById('graphCanvas');
+            const selectedBatDisplay = document.getElementById('selectedBatDisplay');
+
+            // Battery selector
+            const batCards = document.querySelectorAll('.bat-card:not(.custom-bat)');
+            const customE = document.getElementById('customE');
+            const customRtrue = document.getElementById('customRtrue');
+            const customCard = document.getElementById('customBatCard');
+
+            // Manual jockey
+            window.useManual = false;
+            window.manualL = undefined;
+
+            function getK() {
+                return parseFloat(Kslider.value);
+            }
+
+            function getR() {
+                return parseFloat(Rslider.value);
+            }
+
+            function getE() {
+                return currentBattery.E;
+            }
+
+            function getRtrue() {
+                return currentBattery.rTrue;
+            }
+
+            function computeL(R, E, K, rTrue) {
+                const V = E * R / (R + rTrue);
+                let l = V / K;
+                l = l * (1 + (Math.random() * 0.01 - 0.005));
+                return Math.round(l * 100) / 100;
+            }
+
+            function getCurrentL() {
+                if (window.useManual && window.manualL !== undefined) {
+                    return window.manualL;
+                }
+                return computeL(getR(), getE(), getK(), getRtrue());
+            }
+
+            function drawGalvo(def) {
+                const ctx = galvoCanvas.getContext('2d');
+                const w = 200,
+                    h = 100;
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = '#f3ebd8';
+                ctx.fillRect(0, 0, w, h);
+
+                ctx.beginPath();
+                ctx.strokeStyle = '#8b7c63';
+                ctx.lineWidth = 2;
+                ctx.moveTo(100, 20);
+                ctx.lineTo(100, 80);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(100, 50, 35, 0.2, Math.PI - 0.2);
+                ctx.strokeStyle = '#5f4e36';
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+
+                let angle = def * 0.8;
+                let nx = 100 + 38 * Math.sin(angle);
+                let ny = 50 - 38 * Math.cos(angle);
+                ctx.beginPath();
+                ctx.strokeStyle = '#a02929';
+                ctx.lineWidth = 3;
+                ctx.moveTo(100, 50);
+                ctx.lineTo(nx, ny);
+                ctx.stroke();
+
+                ctx.font = 'bold 12px monospace';
+                ctx.fillStyle = '#152835';
+                ctx.fillText('⓿', 90, 35);
+            }
+
+            function updateGalvoAndWire() {
+                const E = getE(),
+                    K = getK(),
+                    R = getR(),
+                    rTrue = getRtrue();
+                const l = getCurrentL();
+                const Vwire = K * l;
+                const Vactual = E * R / (R + rTrue);
+                let diff = Vwire - Vactual;
+                let deflection = diff / 0.15;
+                if (deflection > 1) deflection = 1;
+                if (deflection < -1) deflection = -1;
+                drawGalvo(deflection);
+                balanceMsg.innerText = Math.abs(diff) < 0.002 ? '✅ balanced' : '⚡ off balance';
+
+                let percent = (l / 100) * 100;
+                percent = Math.min(100, Math.max(0, percent));
+                wireFill.style.width = percent + '%';
+                jockey.style.left = percent + '%';
+                lDisplay.innerText = `l = ${l.toFixed(2)} cm`;
+
+                Kval.innerText = getK().toFixed(3);
+                Rval.innerText = getR().toFixed(1);
+            }
+
+            // Battery selection
+            function selectBattery(card, isCustom = false) {
+                batCards.forEach(c => c.classList.remove('selected'));
+                customCard.classList.remove('selected');
+
+                if (!isCustom) {
+                    card.classList.add('selected');
+                    currentBattery = {
+                        name: card.innerText.split('<')[0].trim(),
+                        E: parseFloat(card.dataset.e),
+                        rTrue: parseFloat(card.dataset.r)
+                    };
+                } else {
+                    customCard.classList.add('selected');
+                    currentBattery = {
+                        name: `Custom`,
+                        E: parseFloat(customE.value),
+                        rTrue: parseFloat(customRtrue.value)
+                    };
+                }
+                window.useManual = false;
+                selectedBatDisplay.innerText = `Selected: ${currentBattery.name} (E=${currentBattery.E.toFixed(2)}V, r=${currentBattery.rTrue.toFixed(2)}Ω)`;
+                updateGalvoAndWire();
+            }
+
+            batCards.forEach(card => {
+                card.addEventListener('click', () => selectBattery(card, false));
+            });
+            customCard.addEventListener('click', () => selectBattery(customCard, true));
+            customE.addEventListener('input', () => {
+                if (customCard.classList.contains('selected')) selectBattery(customCard, true);
+            });
+            customRtrue.addEventListener('input', () => {
+                if (customCard.classList.contains('selected')) selectBattery(customCard, true);
+            });
+
+            // Wire click
+            wireArea.addEventListener('click', (e) => {
+                const rect = wireArea.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let percent = (x / rect.width) * 100;
+                percent = Math.min(100, Math.max(0, percent));
+                window.manualL = (percent / 100) * 100;
+                window.useManual = true;
+                updateGalvoAndWire();
+            });
+
+            Kslider.addEventListener('input', () => {
+                window.useManual = false;
+                updateGalvoAndWire();
+            });
+            Rslider.addEventListener('input', () => {
+                window.useManual = false;
+                updateGalvoAndWire();
+            });
+
+            // Table functions
+            function addReading() {
+                const l = getCurrentL();
+                data.push({
+                    R: getR(),
+                    l,
+                    invR: 1 / getR(),
+                    invl: 1 / l
+                });
+                renderTable();
+                computeR();
+            }
+
+            function resetTable() {
+                data = [];
+                [50, 45, 40, 35, 30, 25, 20].forEach(R => {
+                    let l = computeL(R, getE(), getK(), getRtrue());
+                    data.push({
+                        R,
+                        l,
+                        invR: 1 / R,
+                        invl: 1 / l
+                    });
+                });
+                renderTable();
+                computeR();
+            }
+
+            function renderTable() {
+                tableBody.innerHTML = '';
+                data.forEach(d => {
+                    tableBody.innerHTML += `<tr><td>${d.R.toFixed(2)}</td><td>${d.l.toFixed(2)}</td><td>${d.invR.toFixed(5)}</td><td>${d.invl.toFixed(5)}</td></tr>`;
+                });
+            }
+
+            function computeGradientIntercept() {
+                if (data.length < 2) return {
+                    grad: 0,
+                    int: 0,
+                    r: 0
+                };
+                let sumX = 0,
+                    sumY = 0,
+                    sumXY = 0,
+                    sumX2 = 0;
+                data.forEach(p => {
+                    sumX += p.invR;
+                    sumY += p.invl;
+                    sumXY += p.invR * p.invl;
+                    sumX2 += p.invR * p.invR;
+                });
+                const n = data.length;
+                const det = n * sumX2 - sumX * sumX;
+                if (Math.abs(det) < 1e-12) return {
+                    grad: 0,
+                    int: 0,
+                    r: 0
+                };
+                const grad = (n * sumXY - sumX * sumY) / det;
+                const interc = (sumY - grad * sumX) / n;
+                return {
+                    grad,
+                    int: interc,
+                    r: (interc !== 0) ? grad / interc : 0
+                };
+            }
+
+            function computeR() {
+                const {
+                    grad,
+                    int,
+                    r
+                } = computeGradientIntercept();
+                rDisplay.innerText = r.toFixed(3);
+                giDisplay.innerText = `gradient = ${grad.toFixed(5)} , intercept = ${int.toFixed(5)}`;
+                drawGraph();
+            }
+
+            function drawGraph() {
+                const ctx = graphCanvas.getContext('2d');
+                const w = graphCanvas.width,
+                    h = graphCanvas.height;
+                ctx.clearRect(0, 0, w, h);
+                if (data.length === 0) return;
+
+                const L = 55,
+                    Rm = 30,
+                    T = 20,
+                    B = 40;
+                const gw = w - L - Rm,
+                    gh = h - T - B;
+
+                ctx.strokeStyle = '#2f5a88';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(L, h - B);
+                ctx.lineTo(w - Rm, h - B);
+                ctx.moveTo(L, T);
+                ctx.lineTo(L, h - B);
+                ctx.stroke();
+
+                let maxX = Math.max(...data.map(d => d.invR)) * 1.05;
+                let maxY = Math.max(...data.map(d => d.invl)) * 1.05;
+
+                data.forEach(p => {
+                    let x = L + (p.invR / maxX) * gw;
+                    let y = h - B - (p.invl / maxY) * gh;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#2266bb';
+                    ctx.fill();
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                });
+
+                if (data.length >= 2) {
+                    const {
+                        grad,
+                        int
+                    } = computeGradientIntercept();
+                    if (grad !== 0 || int !== 0) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = '#cc6d1d';
+                        ctx.lineWidth = 3;
+                        ctx.setLineDash([6, 4]);
+                        ctx.moveTo(L, h - B - (int / maxY) * gh);
+                        ctx.lineTo(L + gw, h - B - ((grad * maxX + int) / maxY) * gh);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                }
+            }
+
+            // Event listeners
+            document.getElementById('addReadingBtn').addEventListener('click', addReading);
+            document.getElementById('resetTableBtn').addEventListener('click', resetTable);
+            document.getElementById('recalcBtn').addEventListener('click', () => {
+                computeR();
+                updateGalvoAndWire();
+            });
+
+            // Initialize
+            resetTable();
+            updateGalvoAndWire();
+        })();
+    </script>
+</body>
+
+</html>
